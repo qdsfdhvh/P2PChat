@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="WeChatTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/wechat_colorPrimary</item>
+        <item name="colorPrimaryDark">@color/wechat_colorPrimaryDark</item>
+        <item name="colorAccent">@color/wechat_colorAccent</item>
+        <item name="android:windowBackground">@color/wechat_window_background</item>
+    </style>
+
+    <style name="WeChatTextInputLayoutTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/wechat_colorPrimary</item>
+        <item name="colorPrimaryDark">@color/wechat_colorPrimaryDark</item>
+        <item name="colorAccent">@android:color/white</item>
+        <item name="android:textCursorDrawable">@drawable/wechat_bg_cursor</item>
+    </style>
+
+    <style name="WeChatLogoTip">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="WeChatLoginInput">
+        <item name="android:background">@drawable/wechat_bg_white_corner</item>
+        <item name="android:inputType">text</item>
+        <item name="android:lines">1</item>
+        <item name="android:maxLength">15</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:paddingStart">@dimen/wechat_spacing</item>
+        <item name="android:paddingEnd">@dimen/wechat_spacing</item>
+    </style>
+
+    <style name="WeChatButton">
+    </style>
+    <style name="WeChatLoginButton">
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:background">@drawable/wechat_selector_login</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="WeChatPeerNameText">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">@dimen/wechat_peer_name_size</item>
+        <item name="android:lines">1</item>
+    </style>
+</resources>

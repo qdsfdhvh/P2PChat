@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="wechat_nav_host_fragment" type="id"/>
+
+    <item name="wechat_logo" type="id"/>
+    <item name="wechat_logo_tip" type="id"/>
+    <item name="wechat_et_account_layout" type="id"/>
+    <item name="wechat_et_account" type="id"/>
+    <item name="wechat_btn_login" type="id"/>
+
+    <item name="wechat_toolbar" type="id"/>
+    <item name="wechat_list" type="id"/>
+    <item name="wechat_name" type="id"/>
+</resources>

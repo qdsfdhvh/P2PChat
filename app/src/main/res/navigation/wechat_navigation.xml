@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/wechat_navigation"
+    app:startDestination="@id/wechat_login_fragment"
+    tools:ignore="UnusedNavigation">
+    <fragment
+        android:id="@+id/wechat_login_fragment"
+        android:name="com.seiko.wechat.ui.fragment.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/wechat_fragment_login">
+        <action
+            android:id="@+id/wechat_action_select_image"
+            app:destination="@id/wechat_select_image_dialog" />
+        <action
+            android:id="@+id/wechat_action_peers_list"
+            app:destination="@id/wechat_peers_list_fragment"
+            app:popUpTo="@id/wechat_login_fragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
+    <dialog
+        android:id="@+id/wechat_select_image_dialog"
+        android:name="com.seiko.wechat.ui.fragment.SelectImageFragment"
+        android:label="SelectImageFragment"
+        tools:layout="@layout/wechat_dialog_select_image"/>
+    <fragment
+        android:id="@+id/wechat_peers_list_fragment"
+        android:name="com.seiko.wechat.ui.fragment.PeersListFragment"
+        android:label="PeersListFragment"
+        tools:layout="@layout/wechat_fragment_peers_list">
+        <argument
+            android:name="serviceName"
+            app:argType="string"/>
+    </fragment>
+</navigation>

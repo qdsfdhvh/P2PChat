@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="wechat_spacing">8dp</dimen>
+    <dimen name="wechat_logo_size">80dp</dimen>
+    <dimen name="wechat_corner">5dp</dimen>
+
+    <dimen name="wechat_login_margin">20dp</dimen>
+    <dimen name="wechat_login_account_height">55dp</dimen>
+    <dimen name="wechat_login_account_layout_height">75dp</dimen><!-- 55 + 20 -->
+    <dimen name="wechat_login_button_height">@dimen/wechat_login_account_height</dimen>
+
+    <!-- (wechat_logo_size + wechat_spacing) * 3  (80 + 8) * 3 -->
+    <dimen name="wechat_dialog_select_image_list_height">264dp</dimen>
+
+    <dimen name="wechat_peer_logo_size">50dp</dimen>
+    <dimen name="wechat_peer_name_size">16sp</dimen>
+</resources>

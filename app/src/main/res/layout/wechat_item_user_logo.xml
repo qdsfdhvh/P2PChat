@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<de.hdodenhof.circleimageview.CircleImageView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/wechat_logo"
+    android:layout_width="@dimen/wechat_logo_size"
+    android:layout_height="@dimen/wechat_logo_size"
+    android:layout_gravity="center"
+    android:src="@drawable/wechat_iv_0"/>

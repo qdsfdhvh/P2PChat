@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wechat_app_name">P2PChat</string>
+    <string name="wechat_select_head_image">←选择头像</string>
+    <string name="wechat_nick_name">昵称</string>
+    <string name="wechat_login">登录</string>
+    <string name="wechat_login_description">P2P聊天</string>
+    <string name="wechat_select_logo">请选择你头像</string>
+    <string name="wechat_refresh_list">刷新列表</string>
+</resources>
