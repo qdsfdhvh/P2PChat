@@ -1,8 +1,10 @@
 # P2PChat
 
+## 简述
+
 P2P聊天工具，用于学习并试水，搭建中...
 
-# Thanks
+## 感谢
 
 * [P2PChat](https://github.com/LinYaoTian/P2PChat)
 
