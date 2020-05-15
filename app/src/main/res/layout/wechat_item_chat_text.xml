@@ -25,8 +25,9 @@
         android:paddingStart="@dimen/wechat_chat_text_spacing"
         android:paddingEnd="@dimen/wechat_chat_text_triangle_spacing"
         android:textSize="16sp"
-        tools:background="@drawable/wechat_selector_message_text_right"
-        tools:text="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        android:background="@drawable/wechat_selector_message_text_right"
+        android:gravity="center_vertical"
+        tools:text="AAAAAAAAAAAAA"
         app:layout_constraintTop_toTopOf="@id/wechat_logo"
         app:layout_constraintEnd_toStartOf="@id/wechat_logo"
         app:layout_constraintBottom_toBottomOf="parent"/>

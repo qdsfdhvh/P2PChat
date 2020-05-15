@@ -3,7 +3,9 @@ package com.seiko.wechat
 import android.app.Application
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.seiko.wechat.di.dbModule
 import com.seiko.wechat.di.prefModule
+import com.seiko.wechat.di.repoModule
 import com.seiko.wechat.di.viewModelModule
 import com.seiko.wechat.util.timber.NanoDebugTree
 import com.seiko.wechat.work.PrefCheckWorker
@@ -24,7 +26,9 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(prefModule, viewModelModule)
+            modules(prefModule, dbModule,
+                repoModule,
+                viewModelModule)
         }
 
         val request = OneTimeWorkRequestBuilder<PrefCheckWorker>().build()

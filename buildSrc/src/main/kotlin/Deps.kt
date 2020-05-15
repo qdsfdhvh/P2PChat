@@ -18,6 +18,7 @@ object Deps {
     const val support_runtimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}"
     const val support_pagingKtx = "androidx.paging:paging-runtime-ktx:${Versions.paging}"
     const val support_material = "com.google.android.material:material:${Versions.material}"
+    const val support_recyclerview = "androidx.recyclerview:recyclerview:${Versions.recyclerview}"
 
     const val kotlin_stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
     const val kotlin_coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"

@@ -4,6 +4,12 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
 
+kapt {
+    arguments {
+        arg("room.schemaLocation", "$projectDir/schemas".toString())
+    }
+}
+
 android {
     compileSdkVersion Build.compileSdk
     buildToolsVersion Build.buildTools
@@ -55,6 +61,7 @@ dependencies {
     implementation(Deps.support_lifecycleKtx)
     implementation(Deps.support_viewModel)
     implementation(Deps.support_viewModelKtx)
+    implementation(Deps.support_recyclerview)
 
     // Kotlin
     implementation(Deps.kotlin_stdlib)
@@ -71,6 +78,10 @@ dependencies {
 
     // WorkManager
     implementation(Deps.work_runtimeKtx)
+
+    // DataBase
+    implementation(Deps.room_ktx)
+    kapt(Deps.room_compiler)
 
     // Prefs
     implementation(Deps.mmkv_runtime)

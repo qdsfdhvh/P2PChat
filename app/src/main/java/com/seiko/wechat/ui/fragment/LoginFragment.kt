@@ -54,7 +54,6 @@ class LoginFragment : Fragment()
         binding.wechatBtnLogin.setOnClickListener(this)
         binding.wechatEtAccount.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                hideSoftInput()
                 navToPeers()
             }
             true
@@ -89,6 +88,8 @@ class LoginFragment : Fragment()
             return
         }
         viewModel.saveUserName(name)
+
+        hideSoftInput()
         navController.navigate(LoginFragmentDirections.wechatActionPeersList(name))
     }
 

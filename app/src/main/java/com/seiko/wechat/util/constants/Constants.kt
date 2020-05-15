@@ -6,7 +6,12 @@ import com.seiko.wechat.data.model.LogoBean
 /**
  * 本地配置
  */
-internal const val APP_PREF_NAME = "wechat_prefs"
+const val APP_PREF_NAME = "wechat_prefs"
+
+/**
+ * 数据库名称
+ */
+const val APP_DB_NAME = "wechat_database"
 
 /**
  * 本地Logo集合

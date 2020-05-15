@@ -7,8 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.seiko.wechat.data.model.MessageBean
-import com.seiko.wechat.data.model.SendTextBean
+import com.seiko.wechat.data.db.model.MessageBean
 import com.seiko.wechat.databinding.WechatItemChatTextBinding
 
 class ChatAdapter(context: Context) : ListAdapter<MessageBean, ChatAdapter.ItemViewHolder>(DIFF_CALLBACK) {
@@ -43,8 +42,10 @@ class ChatAdapter(context: Context) : ListAdapter<MessageBean, ChatAdapter.ItemV
         private val binding: WechatItemChatTextBinding
     ) : ItemViewHolder(binding.root) {
         override fun bind(position: Int) {
-            val item = getItem(position) as SendTextBean
-            binding.wechatChatText.text = item.text
+            val bean = getItem(position)
+            binding.wechatChatText.text = bean.data.toString()
+//            val item = getItem(position) as SendTextBean
+//            binding.wechatChatText.text = item.text
         }
     }
 }
