@@ -66,7 +66,6 @@ class PeersListFragment : Fragment()
         adapter = PeersAdapter(requireActivity())
         adapter.setOnItemClickListener(object : PeersAdapter.OnItemClickListener {
             override fun onClick(peer: PeerBean) {
-                Timber.d("点击：${peer.name}")
                 findNavController().navigate(PeersListFragmentDirections.wechatActionChat(peer))
             }
         })

@@ -7,5 +7,5 @@
     <string name="wechat_login_description">P2P聊天</string>
     <string name="wechat_select_logo">请选择你头像</string>
     <string name="wechat_refresh_list">刷新列表</string>
-
+    <string name="wechat_send">发送</string>
 </resources>

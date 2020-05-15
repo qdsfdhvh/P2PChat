@@ -19,4 +19,7 @@
     <item name="wechat_btn_audio" type="id"/>
     <item name="wechat_btn_emoji" type="id"/>
     <item name="wechat_divider" type="id"/>
+    <item name="wechat_btn_send" type="id"/>
+    <item name="wechat_barrier" type="id"/>
+    <item name="wechat_et_text" type="id"/>
 </resources>

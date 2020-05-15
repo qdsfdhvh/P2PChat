@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap
 class LivePeerManager(private val selfPeer: Peer) {
     companion object {
         private const val TAG = "OnlineUserManager"
-        private const val PORT = 9156
+        private const val PORT = 19156
 
         private const val TYPE_READY_CHAT = 0x000
         private const val TYPE_EXIT_CHAT= 0x001

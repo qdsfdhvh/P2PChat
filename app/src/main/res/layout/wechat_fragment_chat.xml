@@ -34,7 +34,6 @@
         android:id="@id/wechat_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@android:color/white"
         tools:listitem="@layout/wechat_item_chat_text"
         tools:itemCount="3"
         app:layout_constraintTop_toBottomOf="@id/wechat_btn_back"
