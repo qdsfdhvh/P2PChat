@@ -47,7 +47,7 @@ class LivePeerManager(private val selfPeer: Peer) {
      *
      * A -Broad-> B
      * A <-Reply- B
-     * if B not A: A <=add= B
+     * A <=add= B (if B not A)
      * A =add=> B
      */
     suspend fun listenForPeers(): Flow<Peer> {
@@ -87,7 +87,7 @@ class LivePeerManager(private val selfPeer: Peer) {
 
     /**
      * 添加设备
-     * 先判断是否有Key 在判断peer数据是否变化
+     * 先判断是否有Key 再判断peer数据是否变化
      */
     fun addPeer(peer: Peer): Boolean {
         if (!peers.containsKey(peer.uuid) || !peers.contains(peer)) {
@@ -150,7 +150,7 @@ class LivePeerManager(private val selfPeer: Peer) {
      * 回复目标ip，我已加入聊天
      * @param targetIp 目标ip
      */
-    suspend fun reply(targetIp: String) {
+    private suspend fun reply(targetIp: String) {
 //        selfPeer.port = NetworkDriver.getFreePort().toUShort()
         selfPeer.metaInfo = MetaInfoBuilder()
             .putInt(KEY_TYPE, TYPE_REPLY_CHAT)

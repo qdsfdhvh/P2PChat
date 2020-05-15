@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.callbackFlow
  */
 @ExperimentalCoroutinesApi
 inline fun <reified S: Service, reified B: IBinder> Context.bindService(
-    autoStop: Boolean = true
+    autoStop: Boolean = false
 ): Flow<B> = callbackFlow {
     val intent = Intent(this@bindService, S::class.java)
     val conn = object : ServiceConnection {

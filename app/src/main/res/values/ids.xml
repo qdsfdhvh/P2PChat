@@ -11,4 +11,12 @@
     <item name="wechat_toolbar" type="id"/>
     <item name="wechat_list" type="id"/>
     <item name="wechat_name" type="id"/>
+    <item name="wechat_tv_title" type="id"/>
+    <item name="wechat_btn_more" type="id"/>
+
+    <item name="wechat_btn_back" type="id"/>
+    <item name="wechat_chat_text" type="id"/>
+    <item name="wechat_btn_audio" type="id"/>
+    <item name="wechat_btn_emoji" type="id"/>
+    <item name="wechat_divider" type="id"/>
 </resources>

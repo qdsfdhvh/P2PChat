@@ -5,6 +5,7 @@ import com.seiko.wechat.R
 import com.seiko.wechat.data.model.LogoBean
 import com.seiko.wechat.data.pref.PrefDataSource
 import com.seiko.wechat.util.constants.LOCAL_LOGO_LIST
+import com.seiko.wechat.util.extension.zipFlatMap
 
 class LoginViewModel(
     private val prefs: PrefDataSource
@@ -15,8 +16,13 @@ class LoginViewModel(
     }
 
     private var _userLogoIndex = MutableLiveData<Int>().apply { value = prefs.userLogoIndex }
-    val userLogo: LiveData<Int> = _userLogoIndex.map { index ->
-        logoList.value?.get(index)?.resId ?: R.drawable.wechat_iv_0
+    val userLogo: LiveData<Int> = _userLogoIndex.zipFlatMap(logoList) { index, list ->
+        liveData {
+            if (index == null || list == null) {
+                return@liveData
+            }
+            emit(list[index].resId)
+        }
     }
 
     val userName: LiveData<String> = liveData {

@@ -14,6 +14,7 @@ import com.seiko.wechat.util.loadImage
 class PeersAdapter(context: Context) : ListAdapter<PeerBean, PeersAdapter.ItemViewHolder>(DIFF_CALLBACK) {
 
     private val inflater = LayoutInflater.from(context)
+    private var listener: OnItemClickListener? = null
 
     companion object {
         private const val ARGS_LOGO_RES = "ARGS_LOGO_RES"
@@ -61,6 +62,11 @@ class PeersAdapter(context: Context) : ListAdapter<PeerBean, PeersAdapter.ItemVi
     inner class ItemViewHolder(
         private val binding: WechatItemPeerBinding
     ) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.root.setOnClickListener {
+                listener?.onClick(getItem(layoutPosition))
+            }
+        }
         fun bind(position: Int) {
             val item = getItem(position)
             binding.wechatName.text = item.name
@@ -74,5 +80,13 @@ class PeersAdapter(context: Context) : ListAdapter<PeerBean, PeersAdapter.ItemVi
                 binding.wechatLogo.loadImage(bundle.getInt(ARGS_LOGO_RES))
             }
         }
+    }
+
+    fun setOnItemClickListener(listener: OnItemClickListener?) {
+        this.listener = listener
+    }
+
+    interface OnItemClickListener {
+        fun onClick(peer: PeerBean)
     }
 }

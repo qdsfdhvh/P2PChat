@@ -43,7 +43,7 @@ class SelectImageFragment : DialogFragment() {
     }
 
     private fun setupUI() {
-        val spacing = resources.getDimensionPixelSize(R.dimen.wechat_spacing)
+        val spacing = resources.getDimensionPixelSize(R.dimen.wechat_log_spacing)
         binding.wechatList.addItemDecoration(SpaceItemDecoration(spacing))
 
         binding.wechatList.setHasFixedSize(true)
@@ -51,8 +51,8 @@ class SelectImageFragment : DialogFragment() {
 
         adapter = SelectImageAdapter(requireActivity())
         adapter.setOnItemClickListener(object : SelectImageAdapter.OnItemClickListener {
-            override fun onClick(item: LogoBean) {
-                viewModel.selectUserLogo(item.resId)
+            override fun onClick(position: Int) {
+                viewModel.selectUserLogo(position)
                 dismiss()
             }
         })

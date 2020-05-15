@@ -8,10 +8,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.seiko.wechat.R
+import com.seiko.wechat.data.model.PeerBean
 import com.seiko.wechat.databinding.WechatFragmentPeersListBinding
 import com.seiko.wechat.service.P2pChatService
 import com.seiko.wechat.util.bindService
@@ -62,6 +64,12 @@ class PeersListFragment : Fragment()
         binding.wechatList.layoutManager = LinearLayoutManager(requireActivity())
 
         adapter = PeersAdapter(requireActivity())
+        adapter.setOnItemClickListener(object : PeersAdapter.OnItemClickListener {
+            override fun onClick(peer: PeerBean) {
+                Timber.d("点击：${peer.name}")
+                findNavController().navigate(PeersListFragmentDirections.wechatActionChat(peer))
+            }
+        })
         binding.wechatList.adapter = adapter
     }
 

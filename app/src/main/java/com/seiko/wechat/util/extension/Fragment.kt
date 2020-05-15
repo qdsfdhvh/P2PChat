@@ -5,7 +5,6 @@ import android.graphics.Rect
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 
-
 /**
  * 尝试关闭虚拟键盘
  */

@@ -82,15 +82,12 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
                 .onCompletion { state = State.Stopped }
                 .collect()
         }
+        // 获取最新的Peers集合
         launch {
             onlineUserManager.getPeersFlow()
-                .mapLatest { map ->
-                    map.values.map { it.toBean() }
-                }
+                .mapLatest { map -> map.values.map { it.toBean() } }
                 .flowOn(Dispatchers.Default)
-                .collect {
-                    stateChannel.safeOffer(State.PeersChange(it))
-                }
+                .collect { state = State.PeersChange(it) }
         }
     }
 

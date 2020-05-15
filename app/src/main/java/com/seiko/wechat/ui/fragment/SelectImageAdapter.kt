@@ -43,7 +43,7 @@ class SelectImageAdapter(
 
         init {
             binding.root.setOnClickListener {
-                listener?.onClick(getItem(layoutPosition))
+                listener?.onClick(layoutPosition)
             }
         }
 
@@ -54,7 +54,7 @@ class SelectImageAdapter(
     }
 
     interface OnItemClickListener {
-        fun onClick(item: LogoBean)
+        fun onClick(position: Int)
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener?) {
