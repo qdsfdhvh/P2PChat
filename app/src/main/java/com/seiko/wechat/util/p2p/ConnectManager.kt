@@ -2,7 +2,7 @@ package com.seiko.wechat.util.p2p
 
 import com.seiko.wechat.util.extension.safeOffer
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.io.DataInputStream
@@ -26,28 +26,41 @@ class ConnectManager<T>(private val adapter: MesAdapter<T>) : CoroutineScope {
     override val coroutineContext: CoroutineContext = SupervisorJob() + Dispatchers.IO
 
     private val clients = ConcurrentHashMap<String, Socket>(5)
-    private val receiveJobs = ConcurrentHashMap<String, Job>(5)
 
-    private val msgChannel = ConflatedBroadcastChannel<Pair<String, T>>()
-    private val msgFlow = msgChannel.asFlow()
+    /**
+     * 主动连接的Socket管道
+     * PS: 用于将被动接收的Socket合并在一起统一处理
+     */
+    private val connectChannel = Channel<Socket>()
+    private val connectFlow = connectChannel.consumeAsFlow()
 
     /**
      * 开启TCP服务，等待客户端连接
      */
     @FlowPreview
     @ExperimentalCoroutinesApi
-    suspend fun listenForUser(): Flow<Socket> {
-        return NetworkUtils.listenerTcpPort(PORT)
+    suspend fun listenForUser(): Flow<Pair<String, T>> {
+        val listenFlow = NetworkUtils.listenerTcpPort(PORT)
             .flowOn(Dispatchers.IO)
+        return merge(listenFlow, connectFlow)
             .onCompletion { clear() }
             .filter { !clients.containsKey(it.ip) }
-            .onEach { putClient(it) }
+            .flatMapMerge { socket ->
+                val ip = socket.ip
+                clients[ip] = socket
+
+                Timber.d("有客户端连接到服务, IP=${ip}")
+
+                socket.receive(adapter)
+                    .map { ip to it }
+            }
     }
 
     /**
      * 连接客户端
      * @param targetIp 目标IP
      */
+    @ExperimentalCoroutinesApi
     suspend fun connect(targetIp: String): Flow<Boolean> {
         return flow {
             if (clients.containsKey(targetIp)) {
@@ -59,7 +72,7 @@ class ConnectManager<T>(private val adapter: MesAdapter<T>) : CoroutineScope {
                 val socket = Socket()
                 val address = InetSocketAddress(targetIp, PORT)
                 socket.connect(address, 5000)
-                putClient(socket)
+                connectChannel.safeOffer(socket)
                 Timber.tag(TAG).d("连接成功客户端IP=$targetIp")
                 emit(true)
             } catch (e: IOException) {
@@ -75,20 +88,6 @@ class ConnectManager<T>(private val adapter: MesAdapter<T>) : CoroutineScope {
     fun getSocket(targetIp: String) = clients[targetIp]
 
     /**
-     * 保存
-     */
-    private fun putClient(socket: Socket) {
-        val ip = socket.ip
-        clients[ip] = socket
-        val job = launch {
-            socket.receive(adapter)
-                .collect { msgChannel.safeOffer(ip to it) }
-        }
-        receiveJobs[ip] = job
-        Timber.d("有客户端IP连接到服务IP=${ip}")
-    }
-
-    /**
      * 清空数据
      */
     suspend fun clear() {
@@ -101,13 +100,10 @@ class ConnectManager<T>(private val adapter: MesAdapter<T>) : CoroutineScope {
                     }
                 }
             }
-        receiveJobs.keys().asSequence()
-            .mapNotNull { receiveJobs.remove(it) }
-            .forEach { it.cancel() }
     }
 
     fun release() {
-        msgChannel.close()
+        connectChannel.close()
         cancel()
     }
 

@@ -80,7 +80,7 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
     private val prefDataSource: PrefDataSource by inject()
 
     private lateinit var peerManager: LivePeerManager
-    private lateinit var connectManager: ConnectManager<MessageBean>
+    private lateinit var connectManager: ConnectManager<Int>
 
     private val peers = ConcurrentHashMap<UUID, Peer>(10)
 
@@ -95,7 +95,9 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
         // 监听TCP服务
         launch {
             connectManager.listenForUser()
-                .collect()
+                .collect { pair ->
+                    Timber.d("接受IP=${pair.first}的数据value=${pair.second}")
+                }
         }
         // 监听UDP广播
         launch {

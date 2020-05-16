@@ -21,6 +21,7 @@ import com.seiko.wechat.util.bindService
 import com.seiko.wechat.util.extension.hideSoftInput
 import com.seiko.wechat.util.toast
 import com.seiko.wechat.vm.ChatViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.yield
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -111,7 +112,7 @@ class ChatFragment : Fragment()
             }
         viewModel.messageList.observe(viewLifecycleOwner) { list ->
             lifecycleScope.launchWhenResumed {
-                yield()
+                delay(200)
                 adapter.submitList(list) {
                     binding.wechatList.trySmoothScrollToPosition(list.size - 1)
                 }
