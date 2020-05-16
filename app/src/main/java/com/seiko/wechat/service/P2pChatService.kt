@@ -6,9 +6,11 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import com.seiko.wechat.R
+import com.seiko.wechat.data.db.model.MessageBean
 import com.seiko.wechat.data.model.PeerBean
 import com.seiko.wechat.data.pref.PrefDataSource
 import com.seiko.wechat.util.extension.safeOffer
+import com.seiko.wechat.util.p2p.ConnectManager
 import com.seiko.wechat.util.p2p.LivePeerManager
 import com.seiko.wechat.util.p2p.model.Peer
 import kotlinx.coroutines.*
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 class P2pChatService : Service(), CoroutineScope by MainScope() {
 
@@ -50,8 +53,16 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
     private val stateFlow = stateChannel.asFlow()
 
     inner class P2pBinder: Binder() {
+
         fun getState(): Flow<State> {
             return stateFlow
+        }
+
+        suspend fun connect(peer: PeerBean): Flow<Boolean> {
+            if (peer.address.isEmpty()) {
+                return flowOf(false)
+            }
+            return connectManager.connect(peer.address)
         }
     }
 
@@ -68,24 +79,30 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
 
     private val prefDataSource: PrefDataSource by inject()
 
-    private val onlineUserManager by lazy(LazyThreadSafetyMode.NONE) {
-        LivePeerManager(Peer(uuid = UUID.fromString(prefDataSource.deviceUUID)))
-    }
+    private lateinit var peerManager: LivePeerManager
+    private lateinit var connectManager: ConnectManager<MessageBean>
 
+    private val peers = ConcurrentHashMap<UUID, Peer>(10)
+
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onCreate() {
         super.onCreate()
         Timber.d("onCreate")
-        // 监听UDP广播
+        val selfPeer = Peer(uuid = UUID.fromString(prefDataSource.deviceUUID))
+        peerManager = LivePeerManager(selfPeer)
+        connectManager= ConnectManager(MessageAdapter())
+        // 监听TCP服务
         launch {
-            onlineUserManager.listenForPeers()
-                .onStart { state = State.Started }
-                .onCompletion { state = State.Stopped }
+            connectManager.listenForUser()
                 .collect()
         }
-        // 获取最新的Peers集合
+        // 监听UDP广播
         launch {
-            onlineUserManager.getPeersFlow()
-                .mapLatest { map -> map.values.map { it.toBean() } }
+            peerManager.listenForPeers(peers)
+                .onStart { state = State.Started }
+                .onCompletion { state = State.Stopped }
+                .map { list -> list.map { it.toBean() } }
                 .flowOn(Dispatchers.Default)
                 .collect { state = State.PeersChange(it) }
         }
@@ -99,8 +116,7 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
         super.onDestroy()
         launch(NonCancellable) {
             stateChannel.close()
-            onlineUserManager.exit() // 发送关闭广播
-            onlineUserManager.release()
+            connectManager.release()
         }
         cancel()
         Timber.d("onDestroy")
@@ -112,8 +128,8 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
                 launch {
                     val serviceName = intent.getStringExtra(ARGS_SERVICE_NAME)
                     if (!serviceName.isNullOrEmpty()) {
-                        onlineUserManager.clear()
-                        onlineUserManager.ready(serviceName)
+                        peers.clear()
+                        peerManager.ready(serviceName)
                     }
                 }
             }
@@ -125,5 +141,11 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
 
 private fun Peer.toBean(): PeerBean {
     val name = if (serviceName.isEmpty()) uuid.toString() else serviceName
-    return PeerBean(uuid, name, R.drawable.wechat_iv_2)
+    val address = if (addresses.isEmpty()) "" else addresses[0].hostAddress
+    return PeerBean(
+        uuid = uuid,
+        name = name,
+        logoResId = R.drawable.wechat_iv_2,
+        address = address
+    )
 }

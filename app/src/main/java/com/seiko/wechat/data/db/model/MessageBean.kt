@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.seiko.wechat.util.annotation.ItemType
-import com.seiko.wechat.util.annotation.MessageStateType
+import com.seiko.wechat.util.annotation.MessageState
 import java.util.*
 
 @Entity(
@@ -25,8 +25,8 @@ data class MessageBean(
     // 消息产生时间
     var time: Long = 0,
     // 消息状态 已发送 or 未发送 or Other
-    @MessageStateType
-    val state: Int = MessageStateType.NORMAL,
+    @MessageState
+    val state: Int = MessageState.NORMAL,
     // 消息数据
     val data: MessageData = EmptyData
 )

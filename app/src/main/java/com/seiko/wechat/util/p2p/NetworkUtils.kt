@@ -1,15 +1,16 @@
 package com.seiko.wechat.util.p2p
 
-import com.seiko.wechat.util.p2p.model.Address
-import com.seiko.wechat.util.p2p.model.Peer
-import kotlinx.coroutines.CancellationException
+import android.net.TrafficStats
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import kotlinx.io.core.ByteReadPacket
 import kotlinx.io.core.buildPacket
-import kotlinx.io.core.readBytes
 import timber.log.Timber
+import java.io.IOException
 import java.net.*
 
 object NetworkUtils {
@@ -19,7 +20,7 @@ object NetworkUtils {
     /**
      * 获取本地IP集合
      */
-    fun getAddresses(): List<Address> {
+    fun getAddresses(): List<Inet4Address> {
         return NetworkInterface.getNetworkInterfaces().asSequence()
             .filter { !it.isLoopback }
             .flatMapTo(ArrayList(5)) { networkInterface ->
@@ -39,23 +40,21 @@ object NetworkUtils {
 
     /**
      * 广播UDP数据包
-     * @param peer 数据
+     * @param body 数据
      * @param port 目标端口
      */
-    suspend fun broadcast(peer: Peer, port: Int) {
-        return send("255.255.255.255", peer, port)
+    suspend fun broadcast(body: ByteArray, port: Int) {
+        return sendUdp("255.255.255.255", body, port)
     }
 
     /**
      * 为目标ip发送UDP数据包
      * @param targetIp 目标ip
-     * @param peer 数据
+     * @param body 数据
      * @param port 目标端口
      */
-    suspend fun send(targetIp: String, peer: Peer, port: Int) {
-        val body = peer.createBinaryMessage().readBytes()
+    suspend fun sendUdp(targetIp: String, body: ByteArray, port: Int) {
         val address = Inet4Address.getByName(targetIp)
-
         val packet = DatagramPacket(body, body.size, address, port)
 
         val datagramSocket = DatagramSocket()
@@ -68,19 +67,20 @@ object NetworkUtils {
 
     /**
      * 监听UDP端口
-     * @param port udp端口
+     * @param port 端口号
      */
-    fun listenForPeers(port: Int): Flow<Peer> {
+    @ExperimentalCoroutinesApi
+    fun listenerUdpPort(port: Int): Flow<ByteReadPacket> {
         return channelFlow {
             val serverSocket = DatagramSocket(port)
-
+            Timber.tag(TAG).d("开启UDP端口($port)...")
             invokeOnClose {
                 serverSocket.close()
+                Timber.tag(TAG).d("关闭UDP端口($port)")
             }
-
             val buffer = ByteArray(65536)
             try {
-                while (true) {
+                while (isActive) {
                     val receivePacket = DatagramPacket(buffer, buffer.size)
 
                     withContext(Dispatchers.IO) {
@@ -90,19 +90,40 @@ object NetworkUtils {
                     val bytePacket = buildPacket {
                         writeFully(buffer, 0, receivePacket.length)
                     }
-
-                    try {
-                        val peer = Peer.fromBinary(bytePacket)
-                        send(peer)
-                    } catch (e: Exception) {
-                        if (e is CancellationException) throw e
-                        Timber.tag(TAG).d("Failed parse packet %s", e.localizedMessage)
-                    } finally {
-                        bytePacket.release()
-                    }
+                    send(bytePacket)
                 }
             } catch (e: SocketException) {
                 // socket exception are expected if flow is terminated
+            }
+        }
+    }
+
+    /**
+     * 监听TCP端口
+     * @param port 端口号
+     */
+    @ExperimentalCoroutinesApi
+    fun listenerTcpPort(port: Int): Flow<Socket> {
+        return channelFlow {
+            val serverSocket = try {
+                ServerSocket(port)
+            } catch (e: IOException) {
+                close(e)
+                return@channelFlow
+            }
+            Timber.tag(TAG).d("开启TCP端口($port)...")
+            invokeOnClose {
+                serverSocket.close()
+                Timber.tag(TAG).d("关闭TCP端口($port)")
+            }
+            while (isActive) {
+                try {
+                    val socket = serverSocket.accept()
+                    TrafficStats.tagSocket(socket)
+                    send(socket)
+                } catch (e: IOException) {
+                    // socket exception are expected if flow is terminated
+                }
             }
         }
     }

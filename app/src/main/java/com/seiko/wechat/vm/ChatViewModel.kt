@@ -19,6 +19,9 @@ class ChatViewModel(private val repo: MessageRepository): ViewModel() {
         }
     }
 
+    /**
+     * 设置当前聊天用户
+     */
     fun setPeer(peer: PeerBean) {
         _peer.value = peer
     }

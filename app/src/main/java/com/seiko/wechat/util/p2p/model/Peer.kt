@@ -1,13 +1,17 @@
 package com.seiko.wechat.util.p2p.model
 
+import com.seiko.wechat.util.extension.toAddress
+import com.seiko.wechat.util.extension.toByteArray
+import com.seiko.wechat.util.extension.toUUID
 import kotlinx.io.core.*
+import java.net.Inet4Address
 import java.util.*
 
 /**
  * 局域网内的成员信息
  */
 data class Peer(
-    var addresses: List<Address> = emptyList(),
+    var addresses: List<Inet4Address> = emptyList(),
 //    var port: UShort = 0u,
     var uuid: UUID = UUID.randomUUID(),
     var serviceName: String = "",
@@ -38,6 +42,7 @@ data class Peer(
         } else false
     }
 
+    @ExperimentalUnsignedTypes
     fun createBinaryMessage(): ByteReadPacket {
         val builder = BytePacketBuilder()
 
@@ -70,6 +75,8 @@ data class Peer(
     }
 
     companion object {
+
+        @ExperimentalUnsignedTypes
         fun fromBinary(data: ByteReadPacket): Peer {
             val version = data.readByte()
             check(version == 1.toByte()) { "Only version v1 is supported" }

@@ -1,16 +1,17 @@
 package com.seiko.wechat.util.p2p
 
-import com.seiko.wechat.util.extension.safeOffer
 import com.seiko.wechat.util.p2p.model.MetaInfoBuilder
 import com.seiko.wechat.util.p2p.model.Peer
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import kotlinx.io.core.readBytes
 import timber.log.Timber
 import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-
+import java.util.concurrent.ConcurrentMap
 /**
- * 在线设备管理
+ * 在线设备管理 UDP广播
  */
 class LivePeerManager(private val selfPeer: Peer) {
     companion object {
@@ -24,24 +25,6 @@ class LivePeerManager(private val selfPeer: Peer) {
         private const val KEY_TYPE = "KEY_TYPE"
     }
 
-    private val peersChannel = ConflatedBroadcastChannel<Map<UUID, Peer>>()
-    private val peersFlow = peersChannel.asFlow()
-
-    private val peers = ConcurrentHashMap<UUID, Peer>()
-
-    /**
-     * 获取在线设备的集合流
-     */
-    fun getPeersFlow() = peersFlow
-
-    /**
-     * 释放资源
-     */
-    fun release() {
-        clear()
-        peersChannel.close()
-    }
-
     /**
      * 监听UDP广播
      *
@@ -50,74 +33,61 @@ class LivePeerManager(private val selfPeer: Peer) {
      * A <=add= B (if B not A)
      * A =add=> B
      */
-    suspend fun listenForPeers(): Flow<Peer> {
-        return NetworkUtils.listenForPeers(PORT)
-            .onCompletion { clear() }
-            .onEach { peer ->
-                when(peer.metaInfo.getInt(KEY_TYPE)) {
-                    TYPE_READY_CHAT -> {
-                        Timber.tag(TAG).d("GET <- 接收准备广播，来自name=%s(%s), address=%s",
-                            peer.serviceName, peer.uuid, peer.addresses)
-                        if (addPeer(peer)) {
-                            Timber.tag(TAG).d("被动添加用户，name=%s(%s), address=%s",
-                                peer.serviceName, peer.uuid, peer.addresses)
-                        }
-                        // 收到任何广播请求，都做反馈
-                        reply(peer)
+    @FlowPreview
+    @ExperimentalCoroutinesApi
+    suspend fun listenForPeers(
+        peers: ConcurrentMap<UUID, Peer>
+    ): Flow<Collection<Peer>> {
+        return NetworkUtils.listenerUdpPort(PORT)
+            .flatMapConcat { bytePacket ->
+                flow {
+                    try {
+                        emit(Peer.fromBinary(bytePacket))
+                    } catch (e: Exception) {
+                        Timber.tag(TAG).d("Failed parse packet %s", e.localizedMessage)
+                    } finally {
+                        bytePacket.release()
                     }
-                    TYPE_EXIT_CHAT -> {
-                        Timber.tag(TAG).d("GET <- 接收退出广播, name=%s(%s), address=%s",
-                            peer.serviceName, peer.uuid, peer.addresses)
-                        if (removePeer(peer)) {
-                            Timber.tag(TAG).d("删除用户，name=%s(%s), address=%s",
+                }
+            }
+            .flatMapConcat { peer ->
+                flow<Map<UUID, Peer>> {
+                    when(peer.metaInfo.getInt(KEY_TYPE)) {
+                        TYPE_READY_CHAT -> {
+                            Timber.tag(TAG).d("GET <- 接收准备广播，来自name=%s(%s), address=%s",
                                 peer.serviceName, peer.uuid, peer.addresses)
+                            if (peers.addPeer(peer)) {
+                                emit(peers)
+                                Timber.tag(TAG).d("被动添加用户，name=%s(%s), address=%s",
+                                    peer.serviceName, peer.uuid, peer.addresses)
+                            }
+                            // 收到任何广播请求，都做反馈
+                            reply(peer)
                         }
-                    }
-                    TYPE_REPLY_CHAT -> {
-                        Timber.tag(TAG).d("GET <- 接收反馈广播, name=%s(%s), address=%s",
-                            peer.serviceName, peer.uuid, peer.addresses)
-                        if (addPeer(peer)) {
-                            Timber.tag(TAG).d("主动添加用户，name=%s(%s), address=%s",
+                        TYPE_EXIT_CHAT -> {
+                            Timber.tag(TAG).d("GET <- 接收退出广播, name=%s(%s), address=%s",
                                 peer.serviceName, peer.uuid, peer.addresses)
+                            if (peers.removePeer(peer)) {
+                                emit(peers)
+                                Timber.tag(TAG).d("删除用户，name=%s(%s), address=%s",
+                                    peer.serviceName, peer.uuid, peer.addresses)
+                            }
+                        }
+                        TYPE_REPLY_CHAT -> {
+                            Timber.tag(TAG).d("GET <- 接收反馈广播, name=%s(%s), address=%s",
+                                peer.serviceName, peer.uuid, peer.addresses)
+                            if (peers.addPeer(peer)) {
+                                emit(peers)
+                                Timber.tag(TAG).d("主动添加用户，name=%s(%s), address=%s",
+                                    peer.serviceName, peer.uuid, peer.addresses)
+                            }
                         }
                     }
                 }
             }
-    }
-
-    /**
-     * 添加设备
-     * 先判断是否有Key 再判断peer数据是否变化
-     */
-    fun addPeer(peer: Peer): Boolean {
-        if (!peers.containsKey(peer.uuid) || !peers.contains(peer)) {
-            peers[peer.uuid] = peer
-            peersChannel.safeOffer(peers)
-            return true
-        }
-        return false
-    }
-
-    /**
-     * 删除设备
-     */
-    fun removePeer(peer: Peer): Boolean {
-        if (peers.containsKey(peer.uuid)) {
-            peers.remove(peer.uuid)
-            peersChannel.safeOffer(peers)
-            return true
-        }
-        return false
-    }
-
-    /**
-     * 清空在线设备集合
-     */
-    fun clear() {
-        if (peers.isNotEmpty()) {
-            peers.clear()
-            peersChannel.safeOffer(peers)
-        }
+            .flowOn(Dispatchers.IO)
+            .map { it.values }
+            .flowOn(Dispatchers.Default)
     }
 
     /**
@@ -131,7 +101,7 @@ class LivePeerManager(private val selfPeer: Peer) {
         selfPeer.metaInfo = MetaInfoBuilder()
             .putInt(KEY_TYPE, TYPE_READY_CHAT)
             .build()
-        NetworkUtils.broadcast(selfPeer, PORT)
+        broadcast(selfPeer, PORT)
         Timber.tag(TAG).d("POST -> 发送准备广播，name=%s", serviceName)
     }
 
@@ -142,7 +112,7 @@ class LivePeerManager(private val selfPeer: Peer) {
         selfPeer.metaInfo = MetaInfoBuilder()
             .putInt(KEY_TYPE, TYPE_EXIT_CHAT)
             .build()
-        NetworkUtils.broadcast(selfPeer, PORT)
+        broadcast(selfPeer, PORT)
         Timber.tag(TAG).d("POST -> 发送退出广播，我要退出聊天")
     }
 
@@ -155,17 +125,59 @@ class LivePeerManager(private val selfPeer: Peer) {
         selfPeer.metaInfo = MetaInfoBuilder()
             .putInt(KEY_TYPE, TYPE_REPLY_CHAT)
             .build()
-        NetworkUtils.send(targetIp, selfPeer, PORT)
+        sendUdp(targetIp, selfPeer, PORT)
         Timber.tag(TAG).d("POST -> 发送反馈广播，ip=$targetIp")
     }
 
-    suspend fun reply(peer: Peer) {
+    private suspend fun reply(peer: Peer) {
         for (address in peer.addresses) {
             reply(address.hostAddress)
         }
     }
+}
 
-    protected fun finalize() {
-        release()
+/**
+ * 添加设备
+ * 先判断是否有Key 再判断peer数据是否变化
+ */
+private fun ConcurrentMap<UUID, Peer>.addPeer(peer: Peer): Boolean {
+    if (!containsKey(peer.uuid) || !containsValue(peer)) {
+        put(peer.uuid, peer)
+        return true
     }
+    return false
+}
+
+/**
+ * 删除设备
+ */
+private fun ConcurrentMap<UUID, Peer>.removePeer(peer: Peer): Boolean {
+    if (containsKey(peer.uuid)) {
+        remove(peer.uuid)
+        return true
+    }
+    return false
+}
+
+/**
+ * 广播本设备信息
+ * @param peer 本设备信息
+ * @param port 端口号
+ */
+@ExperimentalUnsignedTypes
+private suspend fun broadcast(peer: Peer, port: Int) {
+    val body = peer.createBinaryMessage().readBytes()
+    NetworkUtils.broadcast(body, port)
+}
+
+/**
+ * 为目标发送本设备信息
+ * @param targetIp 目标设备
+ * @param peer 本设备信息
+ * @param port 端口号
+ */
+@ExperimentalUnsignedTypes
+private suspend fun sendUdp(targetIp: String, peer: Peer, port: Int) {
+    val body = peer.createBinaryMessage().readBytes()
+    NetworkUtils.sendUdp(targetIp, body, port)
 }

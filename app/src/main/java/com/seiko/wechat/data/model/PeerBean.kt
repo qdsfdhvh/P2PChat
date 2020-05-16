@@ -8,5 +8,6 @@ import java.util.*
 data class PeerBean(
     val uuid: UUID,
     val name: String,
-    val logoResId: Int
+    val logoResId: Int,
+    val address: String
 ) : Parcelable
