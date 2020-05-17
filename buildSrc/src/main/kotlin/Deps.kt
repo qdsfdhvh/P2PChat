@@ -9,7 +9,6 @@ object Deps {
     const val support_constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
     const val support_preference = "androidx.preference:preference:${Versions.preference}"
     const val support_preferencex = "com.takisoft.preferencex:preferencex:${Versions.preference}"
-    const val support_preferencex_simplemenu = "com.takisoft.preferencex:preferencex-simplemenu:${Versions.preference}"
     const val support_lifecycle = "androidx.lifecycle:lifecycle-livedata:${Versions.lifecycle}"
     const val support_lifecycleKtx = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle}"
     const val support_viewModel = "androidx.lifecycle:lifecycle-viewmodel:${Versions.lifecycle}"
@@ -21,7 +20,8 @@ object Deps {
     const val support_recyclerview = "androidx.recyclerview:recyclerview:${Versions.recyclerview}"
 
     const val kotlin_stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
-    const val kotlin_coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
+    const val kotlinx_coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.kotlinx_coroutines}"
+    const val kotlinx_io         = "org.jetbrains.kotlinx:kotlinx-io-jvm:${Versions.kotlinx_io}"
 
     const val koin_scope = "org.koin:koin-androidx-scope:${Versions.koin}"
     const val koin_viewModel = "org.koin:koin-androidx-viewmodel:${Versions.koin}"
@@ -37,9 +37,6 @@ object Deps {
     const val moshi_core = "com.squareup.moshi:moshi:${Versions.moshi}"
     const val moshi_compiler = "com.squareup.moshi:moshi-kotlin-codegen:${Versions.moshi}"
 
-    const val arouter_api = "com.alibaba:arouter-api:${Versions.arouterApi}"
-    const val arouter_compiler = "com.alibaba:arouter-compiler:${Versions.arouterCompiler}"
-
     const val room_ktx = "androidx.room:room-ktx:${Versions.room}"
     const val room_compiler = "androidx.room:room-compiler:${Versions.room}"
 
@@ -48,10 +45,5 @@ object Deps {
     const val navigation_uiKtx = "androidx.navigation:navigation-ui-ktx:${Versions.navigation}"
     const val navigation_fragmentKtx = "androidx.navigation:navigation-fragment-ktx:${Versions.navigation}"
 
-    const val cc_api = "com.billy.android:cc:${Versions.ccApi}"
-
     const val log_timber = "com.jakewharton.timber:timber:${Versions.timber}"
-
-    const val glide_runtime = "com.github.bumptech.glide:glide:${Versions.glide}"
-    const val glide_compiler = "com.github.bumptech.glide:compiler:${Versions.glide}"
 }

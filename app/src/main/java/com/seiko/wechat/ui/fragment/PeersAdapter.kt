@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.api.load
 import com.seiko.wechat.data.model.PeerBean
 import com.seiko.wechat.databinding.WechatItemPeerBinding
-import com.seiko.wechat.util.loadImage
 
 class PeersAdapter(context: Context) : ListAdapter<PeerBean, PeersAdapter.ItemViewHolder>(DIFF_CALLBACK) {
 
@@ -70,14 +70,14 @@ class PeersAdapter(context: Context) : ListAdapter<PeerBean, PeersAdapter.ItemVi
         fun bind(position: Int) {
             val item = getItem(position)
             binding.wechatName.text = item.name
-            binding.wechatLogo.loadImage(item.logoResId)
+            binding.wechatLogo.load(item.logoResId)
         }
         fun bind(bundle: Bundle) {
             if (bundle.containsKey(ARGS_NAME)) {
                 binding.wechatName.text = bundle.getString(ARGS_NAME)
             }
             if (bundle.containsKey(ARGS_LOGO_RES)) {
-                binding.wechatLogo.loadImage(bundle.getInt(ARGS_LOGO_RES))
+                binding.wechatLogo.load(bundle.getInt(ARGS_LOGO_RES))
             }
         }
     }

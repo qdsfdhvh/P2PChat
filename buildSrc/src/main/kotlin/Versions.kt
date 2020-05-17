@@ -13,7 +13,8 @@ object Versions {
     const val recyclerview = "1.1.0"
 
     const val kotlin = "1.3.72"
-    const val coroutines = "1.3.5"
+    const val kotlinx_coroutines = "1.3.5"
+    const val kotlinx_io = "0.1.6"
 
     const val koin = "2.1.5"
     const val mmkv = "1.1.1"
@@ -22,21 +23,11 @@ object Versions {
 
     const val moshi = "1.9.2"
 
-    const val arouterApi = "1.5.0"
-    const val arouterCompiler = "1.2.2"
-
     const val room = "2.2.5"
     const val work = "2.3.4"
     const val navigation = "2.2.2"
 
-    const val ccApi = "2.1.6"
-    const val ccRegister = "1.1.2"
-
     const val timber = "4.7.1"
-
-    const val glide = "4.11.0"
-
-    const val byteX = "0.1.5"
 }
 
 object Build {

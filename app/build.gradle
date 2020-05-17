@@ -65,8 +65,8 @@ dependencies {
 
     // Kotlin
     implementation(Deps.kotlin_stdlib)
-    implementation(Deps.kotlin_coroutines)
-    implementation("org.jetbrains.kotlinx:kotlinx-io-jvm:0.1.6")
+    implementation(Deps.kotlinx_coroutines)
+    implementation(Deps.kotlinx_io)
 
     // Koin注入
     implementation(Deps.koin_scope)
@@ -90,8 +90,7 @@ dependencies {
     implementation(Deps.log_timber)
 
     // 图片
-    implementation(Deps.glide_runtime)
-    kapt(Deps.glide_compiler)
+    implementation("io.coil-kt:coil:0.11.0")
 
     // 圆角图片
     implementation("de.hdodenhof:circleimageview:3.0.0")

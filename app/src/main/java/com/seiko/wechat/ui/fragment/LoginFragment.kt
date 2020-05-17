@@ -9,10 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import coil.api.load
 import com.seiko.wechat.R
 import com.seiko.wechat.databinding.WechatFragmentLoginBinding
 import com.seiko.wechat.util.extension.hideSoftInput
-import com.seiko.wechat.util.loadImage
 import com.seiko.wechat.util.toast
 import com.seiko.wechat.vm.LoginViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -62,7 +62,7 @@ class LoginFragment : Fragment()
 
     private fun bindViewModel() {
         viewModel.userLogo.observe(viewLifecycleOwner) { resId ->
-            binding.wechatLogo.loadImage(resId)
+            binding.wechatLogo.load(resId)
         }
         viewModel.userName.observe(viewLifecycleOwner) { name ->
             binding.wechatEtAccount.takeIf { it.text.isNullOrEmpty()}
