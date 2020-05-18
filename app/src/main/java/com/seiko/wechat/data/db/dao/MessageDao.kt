@@ -14,8 +14,8 @@ interface MessageDao {
     @Query("DELETE FROM Message_table WHERE uuid=:uuid")
     suspend fun delete(uuid: UUID): Int
 
-    @Query("SELECT * FROM Message_table WHERE uuid=:uuid ORDER BY time")
-    fun all(uuid: UUID): LiveData<List<MessageBean>>
+    @Query("SELECT * FROM Message_table WHERE uuid=:uuid AND time>=:time ORDER BY time")
+    fun all(uuid: UUID, time: Long): LiveData<List<MessageBean>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun put(bean: MessageBean): Long

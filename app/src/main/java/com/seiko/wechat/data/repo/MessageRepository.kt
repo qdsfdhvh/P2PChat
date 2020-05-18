@@ -11,7 +11,7 @@ class MessageRepository(private val messageDao: MessageDao) {
      * 获得指定人员的消息记录
      */
     fun getMessageList(uuid: UUID): LiveData<List<MessageBean>> {
-        return messageDao.all(uuid)
+        return messageDao.all(uuid, toDayFirstTimeMillis())
     }
 
     /**
@@ -23,4 +23,16 @@ class MessageRepository(private val messageDao: MessageDao) {
         }
         return messageDao.put(bean) > 0
     }
+}
+
+/**
+ * 今天0时0分0秒的时间戳
+ */
+private fun toDayFirstTimeMillis(): Long {
+    val calendar = Calendar.getInstance()
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    return calendar.timeInMillis
 }
