@@ -34,14 +34,14 @@ class App : Application() {
         val request = OneTimeWorkRequestBuilder<PrefCheckWorker>().build()
         WorkManager.getInstance(this).enqueue(request)
 
-        setupStrictModel()
+        setupStrictMode()
     }
 }
 
 /**
  * 开启严格模式
  */
-private fun setupStrictModel() {
+private fun setupStrictMode() {
     if (BuildConfig.DEBUG) {
         val penaltyListenerExecutor = Executors.newSingleThreadExecutor()
         StrictMode.setThreadPolicy(
@@ -50,7 +50,7 @@ private fun setupStrictModel() {
                 .apply {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                         penaltyListener(penaltyListenerExecutor, StrictMode.OnThreadViolationListener {
-                            Timber.w(it)
+                            Timber.tag("StrictMode").w(it)
                         })
                     } else {
                         penaltyLog()
@@ -69,7 +69,7 @@ private fun setupStrictModel() {
                                     return@OnVmViolationListener
                                 }
                             }
-                            Timber.w(it)
+                            Timber.tag("StrictMode").w(it)
                         })
                     } else {
                         penaltyLog()
