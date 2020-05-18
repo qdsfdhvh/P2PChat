@@ -16,10 +16,10 @@ import androidx.annotation.IntDef
 @Retention(AnnotationRetention.SOURCE)
 annotation class MessageType {
     companion object {
-        const val TEXT = 0  // 文字
-        const val AUDIO = 1 // 音频
-        const val IMAGE = 2 // 图片
-        const val FILE = 3  // 文件
-        const val ERROR = 4 // 错误
+        const val TEXT = 1  // 文字
+        const val AUDIO = 2 // 音频
+        const val IMAGE = 3 // 图片
+        const val FILE = 4  // 文件
+        const val ERROR = 5 // 错误
     }
 }

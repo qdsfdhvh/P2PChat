@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import kotlinx.io.core.ByteReadPacket
@@ -72,12 +73,19 @@ object NetworkUtils {
     @ExperimentalCoroutinesApi
     fun listenerUdpPort(port: Int): Flow<ByteReadPacket> {
         return channelFlow {
-            val serverSocket = DatagramSocket(port)
+            val serverSocket = try {
+                DatagramSocket(port)
+            } catch (e: SocketException) {
+                close(e)
+                return@channelFlow
+            }
             Timber.tag(TAG).d("开启UDP端口($port)...")
+
             invokeOnClose {
                 serverSocket.close()
                 Timber.tag(TAG).d("关闭UDP端口($port)")
             }
+
             val buffer = ByteArray(65536)
             try {
                 while (isActive) {
@@ -95,7 +103,7 @@ object NetworkUtils {
             } catch (e: SocketException) {
                 // socket exception are expected if flow is terminated
             }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
     /**
@@ -106,25 +114,30 @@ object NetworkUtils {
     fun listenerTcpPort(port: Int): Flow<Socket> {
         return channelFlow {
             val serverSocket = try {
-                ServerSocket(port)
+                withContext(Dispatchers.IO) {
+                    ServerSocket(port)
+                }
             } catch (e: IOException) {
                 close(e)
                 return@channelFlow
             }
             Timber.tag(TAG).d("开启TCP端口($port)...")
+
             invokeOnClose {
                 serverSocket.close()
                 Timber.tag(TAG).d("关闭TCP端口($port)")
             }
+
             while (isActive) {
                 try {
-                    val socket = serverSocket.accept()
-                    TrafficStats.tagSocket(socket)
+                    val socket = withContext(Dispatchers.IO) {
+                        serverSocket.accept()
+                    }
                     send(socket)
                 } catch (e: IOException) {
                     // socket exception are expected if flow is terminated
                 }
             }
-        }
+        }.flowOn(Dispatchers.IO)
     }
 }

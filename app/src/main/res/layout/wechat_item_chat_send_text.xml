@@ -31,4 +31,26 @@
         app:layout_constraintTop_toTopOf="@id/wechat_logo"
         app:layout_constraintEnd_toStartOf="@id/wechat_logo"
         app:layout_constraintBottom_toBottomOf="parent"/>
+    <ProgressBar
+        android:id="@+id/wechat_progress"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="@dimen/wechat_spacing"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/wechat_chat_text"
+        app:layout_constraintTop_toTopOf="@id/wechat_chat_text"
+        app:layout_constraintBottom_toBottomOf="@id/wechat_chat_text"/>
+    <ImageView
+        android:id="@+id/wechat_img_error"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="@dimen/wechat_spacing"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:tint="@android:color/holo_red_dark"
+        android:src="@drawable/wechat_ic_error_outline_black_24dp"
+        app:layout_constraintEnd_toStartOf="@id/wechat_chat_text"
+        app:layout_constraintTop_toTopOf="@id/wechat_chat_text"
+        app:layout_constraintBottom_toBottomOf="@id/wechat_chat_text"
+        tools:ignore="ContentDescription" />
 </androidx.constraintlayout.widget.ConstraintLayout>

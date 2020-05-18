@@ -1,4 +1,4 @@
-package com.seiko.wechat.ui.fragment
+package com.seiko.wechat.ui.adapter
 
 import android.content.Context
 import android.os.Bundle
@@ -11,7 +11,9 @@ import coil.api.load
 import com.seiko.wechat.data.model.PeerBean
 import com.seiko.wechat.databinding.WechatItemPeerBinding
 
-class PeersAdapter(context: Context) : ListAdapter<PeerBean, PeersAdapter.ItemViewHolder>(DIFF_CALLBACK) {
+class PeersAdapter(context: Context) : ListAdapter<PeerBean, PeersAdapter.ItemViewHolder>(
+    DIFF_CALLBACK
+) {
 
     private val inflater = LayoutInflater.from(context)
     private var listener: OnItemClickListener? = null

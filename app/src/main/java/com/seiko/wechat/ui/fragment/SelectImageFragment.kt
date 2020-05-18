@@ -8,8 +8,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.GridLayoutManager
 import com.seiko.wechat.R
-import com.seiko.wechat.data.model.LogoBean
 import com.seiko.wechat.databinding.WechatDialogSelectImageBinding
+import com.seiko.wechat.ui.adapter.SelectImageAdapter
 import com.seiko.wechat.ui.widget.SpaceItemDecoration
 import com.seiko.wechat.vm.LoginViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -49,7 +49,8 @@ class SelectImageFragment : DialogFragment() {
         binding.wechatList.setHasFixedSize(true)
         binding.wechatList.layoutManager = GridLayoutManager(requireActivity(), 3)
 
-        adapter = SelectImageAdapter(requireActivity())
+        adapter =
+            SelectImageAdapter(requireActivity())
         adapter.setOnItemClickListener(object : SelectImageAdapter.OnItemClickListener {
             override fun onClick(position: Int) {
                 viewModel.selectUserLogo(position)

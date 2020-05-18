@@ -5,9 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -16,8 +14,11 @@ import com.seiko.wechat.R
 import com.seiko.wechat.data.model.PeerBean
 import com.seiko.wechat.databinding.WechatFragmentPeersListBinding
 import com.seiko.wechat.service.P2pChatService
+import com.seiko.wechat.ui.adapter.PeersAdapter
 import com.seiko.wechat.util.bindService
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 class PeersListFragment : Fragment()
@@ -75,8 +76,7 @@ class PeersListFragment : Fragment()
     private fun bindViewModel() {
         bindService<P2pChatService, P2pChatService.P2pBinder>()
             .flatMapConcat { it.getState() }
-            .asLiveData(lifecycleScope.coroutineContext)
-            .observe(viewLifecycleOwner) { state ->
+            .onEach { state ->
                 when(state) {
                     is P2pChatService.State.Started -> {
                         Timber.d("P2P聊天已开启")
@@ -90,6 +90,7 @@ class PeersListFragment : Fragment()
                     }
                 }
             }
+            .launchIn(lifecycleScope)
     }
 
     override fun onClick(v: View?) {

@@ -1,4 +1,4 @@
-package com.seiko.wechat.ui.fragment
+package com.seiko.wechat.ui.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -12,7 +12,9 @@ import com.seiko.wechat.databinding.WechatItemUserLogoBinding
 
 class SelectImageAdapter(
     context: Context
-) : ListAdapter<LogoBean, SelectImageAdapter.ItemViewHolder>(DIFF_CALLBACK) {
+) : ListAdapter<LogoBean, SelectImageAdapter.ItemViewHolder>(
+    DIFF_CALLBACK
+) {
 
     private val inflater = LayoutInflater.from(context)
     private var listener: OnItemClickListener? = null

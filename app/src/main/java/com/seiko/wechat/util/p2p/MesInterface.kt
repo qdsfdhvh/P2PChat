@@ -1,15 +1,15 @@
 package com.seiko.wechat.util.p2p
 
-import java.io.DataInputStream
-import java.io.DataOutputStream
+import java.net.Socket
 
-
-interface MesDecoder<out T> {
-    suspend fun decode(input: DataInputStream): T?
+interface MesDecoder<I, out T> {
+    fun createSource(socket: Socket): I
+    fun decode(source: I): T?
 }
 
-interface MesEncoder<in T> {
-    suspend fun encode(data: T, output: DataOutputStream)
+interface MesEncoder<O, in T> {
+    fun createSink(socket: Socket): O
+    fun encode(sink: O, msg: T)
 }
 
-abstract class MesAdapter<T> : MesDecoder<T>, MesEncoder<T>
+abstract class MesAdapter<I, O, T> : MesDecoder<I, T>, MesEncoder<O, T>

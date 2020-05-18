@@ -6,15 +6,23 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import com.seiko.wechat.R
+import com.seiko.wechat.data.db.model.ImageData
 import com.seiko.wechat.data.db.model.MessageBean
+import com.seiko.wechat.data.db.model.MessageData
+import com.seiko.wechat.data.db.model.TextData
 import com.seiko.wechat.data.model.PeerBean
 import com.seiko.wechat.data.pref.PrefDataSource
+import com.seiko.wechat.data.repo.MessageRepository
+import com.seiko.wechat.util.annotation.ItemType
+import com.seiko.wechat.util.annotation.MessageState
 import com.seiko.wechat.util.extension.safeOffer
 import com.seiko.wechat.util.p2p.ConnectManager
 import com.seiko.wechat.util.p2p.LivePeerManager
 import com.seiko.wechat.util.p2p.model.Peer
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
@@ -25,8 +33,11 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
 
     companion object {
         private const val ACTION_READY = "ACTION_READY"
+        private const val ACTION_SEND = "ACTION_SEND"
 
         private const val ARGS_SERVICE_NAME = "ARGS_SERVICE_NAME"
+        private const val ARGS_PEER_BEAN = "ARGS_PEER_BEAN"
+        private const val ARGS_MESSAGE_DATA = "ARGS_MESSAGE_DATA"
 
         /**
          * 发送广播，用户获取局域网内所有用户的反馈
@@ -36,6 +47,18 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
             val intent = Intent(context, P2pChatService::class.java)
             intent.action = ACTION_READY
             intent.putExtra(ARGS_SERVICE_NAME, serviceName)
+            context.startService(intent)
+        }
+
+        /**
+         * 为目标设备发送信息
+         */
+        @JvmStatic
+        fun send(context: Context, peer: PeerBean, data: MessageData) {
+            val intent = Intent(context, P2pChatService::class.java)
+            intent.action = ACTION_SEND
+            intent.putExtra(ARGS_PEER_BEAN, peer)
+            intent.putExtra(ARGS_MESSAGE_DATA, data)
             context.startService(intent)
         }
     }
@@ -52,20 +75,6 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
     private val stateChannel = ConflatedBroadcastChannel<State>()
     private val stateFlow = stateChannel.asFlow()
 
-    inner class P2pBinder: Binder() {
-
-        fun getState(): Flow<State> {
-            return stateFlow
-        }
-
-        suspend fun connect(peer: PeerBean): Flow<Boolean> {
-            if (peer.address.isEmpty()) {
-                return flowOf(false)
-            }
-            return connectManager.connect(peer.address)
-        }
-    }
-
     /**
      * 当前服务状态
      */
@@ -77,10 +86,31 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
             }
         }
 
-    private val prefDataSource: PrefDataSource by inject()
+    /**
+     * 消息队列
+     */
+    private val messageActor = actor<Pair<String, MessageBean>>(
+        context = coroutineContext + Dispatchers.IO,
+        capacity = Channel.BUFFERED
+    ) {
+        var ip: String
+        var msg: MessageBean
+        for (pair in channel) {
+            ip = pair.first ; msg = pair.second
+            if (connectManager.send(ip, msg)) {
+                messageRepo.updateState(msg.time, MessageState.POSTED)
+            } else {
+                messageRepo.updateState(msg.time, MessageState.ERROR)
+            }
+        }
+    }
 
+    private val prefDataSource: PrefDataSource by inject()
+    private val messageRepo: MessageRepository by inject()
+
+    private lateinit var selfPeer: Peer
     private lateinit var peerManager: LivePeerManager
-    private lateinit var connectManager: ConnectManager<Int>
+    private val connectManager = ConnectManager(MessageAdapter())
 
     private val peers = ConcurrentHashMap<UUID, Peer>(10)
 
@@ -89,35 +119,32 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
     override fun onCreate() {
         super.onCreate()
         Timber.d("onCreate")
-        val selfPeer = Peer(uuid = UUID.fromString(prefDataSource.deviceUUID))
+        selfPeer = Peer(uuid = UUID.fromString(prefDataSource.deviceUUID))
         peerManager = LivePeerManager(selfPeer)
-        connectManager= ConnectManager(MessageAdapter())
         // 监听TCP服务
         launch {
-            connectManager.listenForUser()
+            connectManager.stream()
                 .collect { pair ->
-                    Timber.d("接受IP=${pair.first}的数据value=${pair.second}")
+                    val msg = pair.second
+                    messageRepo.saveMessage(msg)
                 }
         }
         // 监听UDP广播
         launch {
-            peerManager.listenForPeers(peers)
+            peerManager.stream(peers)
                 .onStart { state = State.Started }
                 .onCompletion { state = State.Stopped }
-                .map { list -> list.map { it.toBean() } }
+                .map { map -> map.values.map { it.toBean() } }
                 .flowOn(Dispatchers.Default)
                 .collect { state = State.PeersChange(it) }
         }
-    }
-
-    override fun onBind(intent: Intent?): IBinder? {
-        return P2pBinder()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         launch(NonCancellable) {
             stateChannel.close()
+            peerManager.exit()
             connectManager.release()
         }
         cancel()
@@ -127,20 +154,71 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when(intent?.action) {
             ACTION_READY -> {
-                launch {
-                    val serviceName = intent.getStringExtra(ARGS_SERVICE_NAME)
-                    if (!serviceName.isNullOrEmpty()) {
-                        peers.clear()
-                        peerManager.ready(serviceName)
-                    }
-                }
+                val serviceName = intent.getStringExtra(ARGS_SERVICE_NAME)
+                actionBroadReady(serviceName)
+            }
+            ACTION_SEND -> {
+                val peer = intent.getParcelableExtra<PeerBean>(ARGS_PEER_BEAN)
+                val data = intent.getParcelableExtra<MessageData>(ARGS_MESSAGE_DATA)
+                actionSendMessage(peer, data)
             }
         }
         return START_NOT_STICKY
     }
 
+    /**
+     * 发送广播，本设备准备就绪
+     */
+    private fun actionBroadReady(serviceName: String?) {
+        launch {
+            if (!serviceName.isNullOrEmpty()) {
+                peers.clear()
+                peerManager.ready(serviceName)
+            }
+        }
+    }
+
+    /**
+     * 给目标设备发送数据
+     */
+    private fun actionSendMessage(peer: PeerBean?, data: MessageData?) {
+        if (peer == null || data == null) return
+        launch {
+            // 让本部保存的消息与发送的消息使用相同的时间戳，消息发送成功后一起更新状态
+            val time = System.currentTimeMillis()
+            // 本地保存
+            val sendBean = data.toSendBean(peer.uuid, time)
+            messageRepo.saveMessage(sendBean)
+
+            // 发送
+            val receiveBean = data.toReceiveBean(selfPeer.uuid, time)
+            messageActor.send(peer.address to receiveBean)
+        }
+    }
+
+    private val binder by lazy(LazyThreadSafetyMode.NONE) { P2pBinder() }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return binder
+    }
+
+    inner class P2pBinder: Binder() {
+
+        fun getState(): Flow<State> = stateFlow
+
+        fun connect(peer: PeerBean): Flow<Boolean> {
+            return if (peer.address.isEmpty()) {
+                flowOf(false)
+            } else {
+                connectManager.connect(peer.address)
+            }
+        }
+    }
 }
 
+/**
+ * 将Peer转为PeerBean
+ */
 private fun Peer.toBean(): PeerBean {
     val name = if (serviceName.isEmpty()) uuid.toString() else serviceName
     val address = if (addresses.isEmpty()) "" else addresses[0].hostAddress
@@ -149,5 +227,31 @@ private fun Peer.toBean(): PeerBean {
         name = name,
         logoResId = R.drawable.wechat_iv_2,
         address = address
+    )
+}
+
+private fun MessageData.toSendBean(uuid: UUID, time: Long): MessageBean {
+    return MessageBean(
+        type = when(this) {
+            is TextData -> ItemType.SEND_TEXT
+            is ImageData -> ItemType.SEND_IMAGE
+            else -> ItemType.NORMAL
+        },
+        uuid = uuid,
+        time = time,
+        data = this
+    )
+}
+
+private fun MessageData.toReceiveBean(uuid: UUID, time: Long): MessageBean {
+    return MessageBean(
+        type = when(this) {
+            is TextData -> ItemType.RECEIVE_TEXT
+            is ImageData -> ItemType.RECEIVE_IMAGE
+            else -> ItemType.NORMAL
+        },
+        uuid = uuid,
+        time = time,
+        data = this
     )
 }

@@ -35,9 +35,9 @@ class LivePeerManager(private val selfPeer: Peer) {
      */
     @FlowPreview
     @ExperimentalCoroutinesApi
-    suspend fun listenForPeers(
+    suspend fun stream(
         peers: ConcurrentMap<UUID, Peer>
-    ): Flow<Collection<Peer>> {
+    ): Flow<Map<UUID, Peer>> {
         return NetworkUtils.listenerUdpPort(PORT)
             .flatMapConcat { bytePacket ->
                 flow {
@@ -85,9 +85,6 @@ class LivePeerManager(private val selfPeer: Peer) {
                     }
                 }
             }
-            .flowOn(Dispatchers.IO)
-            .map { it.values }
-            .flowOn(Dispatchers.Default)
     }
 
     /**

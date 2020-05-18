@@ -3,6 +3,7 @@ package com.seiko.wechat.data.repo
 import androidx.lifecycle.LiveData
 import com.seiko.wechat.data.db.dao.MessageDao
 import com.seiko.wechat.data.db.model.MessageBean
+import com.seiko.wechat.util.annotation.MessageState
 import java.util.*
 
 class MessageRepository(private val messageDao: MessageDao) {
@@ -22,6 +23,13 @@ class MessageRepository(private val messageDao: MessageDao) {
             bean.time = System.currentTimeMillis()
         }
         return messageDao.put(bean) > 0
+    }
+
+    /**
+     * 更新消息状态
+     */
+    suspend fun updateState(time: Long, @MessageState state: Int): Boolean {
+        return messageDao.updateState(time, state) > 0
     }
 }
 

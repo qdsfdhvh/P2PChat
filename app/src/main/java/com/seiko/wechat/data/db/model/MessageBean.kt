@@ -1,10 +1,12 @@
 package com.seiko.wechat.data.db.model
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.seiko.wechat.util.annotation.ItemType
 import com.seiko.wechat.util.annotation.MessageState
+import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 @Entity(
@@ -13,6 +15,7 @@ import java.util.*
         Index(value = ["uuid"], unique = false) // 设置索引
     ]
 )
+@Parcelize
 data class MessageBean(
     // 主键
     @PrimaryKey(autoGenerate = true)
@@ -29,25 +32,28 @@ data class MessageBean(
     val state: Int = MessageState.NORMAL,
     // 消息数据
     val data: MessageData = EmptyData
-)
+): Parcelable
 
 /**
  * 消息内容
  */
-sealed class MessageData
+sealed class MessageData : Parcelable
 // 空数据
+@Parcelize
 object EmptyData: MessageData() {
     override fun toString(): String {
         return "null"
     }
 }
 // 文字
+@Parcelize
 data class TextData(val text: String): MessageData() {
     override fun toString(): String {
         return text
     }
 }
 // 图片
+@Parcelize
 data class ImageData(val imagePath: String): MessageData() {
     override fun toString(): String {
         return imagePath

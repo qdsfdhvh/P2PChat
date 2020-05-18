@@ -17,6 +17,9 @@ interface MessageDao {
     @Query("SELECT * FROM Message_table WHERE uuid=:uuid AND time>=:time ORDER BY time")
     fun all(uuid: UUID, time: Long): LiveData<List<MessageBean>>
 
+    @Query("UPDATE Message_table SET state=:state WHERE time=:time")
+    suspend fun updateState(time: Long, state: Int): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun put(bean: MessageBean): Long
 }

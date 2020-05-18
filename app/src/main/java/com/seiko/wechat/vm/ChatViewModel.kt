@@ -14,7 +14,7 @@ class ChatViewModel(private val repo: MessageRepository): ViewModel() {
 
     private val _peer = MutableLiveData<PeerBean>()
     val messageList: LiveData<List<MessageBean>> = _peer.switchMap { peer ->
-        liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
+        liveData(viewModelScope.coroutineContext) {
             emitSource(repo.getMessageList(peer.uuid))
         }
     }
@@ -26,19 +26,4 @@ class ChatViewModel(private val repo: MessageRepository): ViewModel() {
         _peer.value = peer
     }
 
-    fun sendText(peer: PeerBean, text: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val bean = TextData(text).toBean(peer, ItemType.SEND_TEXT)
-            repo.saveMessage(bean)
-        }
-    }
-}
-
-private fun MessageData.toBean(peer: PeerBean, @ItemType type: Int): MessageBean {
-    return MessageBean(
-        type = type,
-        uuid = peer.uuid,
-        time = System.currentTimeMillis(),
-        data = this
-    )
 }
