@@ -1,5 +1,6 @@
 package com.seiko.wechat.ui.fragment
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +33,16 @@ class PeersListFragment : Fragment()
     private lateinit var adapter: PeersAdapter
     private lateinit var popWindow: PeersMenuPopup
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().window?.let {
+            // 深色字体
+            it.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            // 透明状态栏
+            it.statusBarColor = Color.TRANSPARENT
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,6 +65,7 @@ class PeersListFragment : Fragment()
     private fun setupUI() {
         binding.wechatTvTitle.text = "在线用户"
         binding.wechatBtnMore.setOnClickListener(this)
+        binding.wechatBtnExit.setOnClickListener(this)
 
         popWindow = PeersMenuPopup(requireActivity())
         popWindow.setOnClickListener(this)
@@ -95,6 +107,9 @@ class PeersListFragment : Fragment()
 
     override fun onClick(v: View?) {
         when(v?.id) {
+            R.id.wechat_btn_exit -> {
+                findNavController().navigate(R.id.wechat_action_login)
+            }
             R.id.wechat_btn_more -> {
                 popWindow.showAsDropDown(v)
             }

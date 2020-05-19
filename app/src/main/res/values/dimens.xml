@@ -10,6 +10,7 @@
 
     <dimen name="wechat_login_margin">20dp</dimen>
     <dimen name="wechat_login_account_height">55dp</dimen>
+    <dimen name="wechat_login_account_layout_width">320dp</dimen>
     <dimen name="wechat_login_account_layout_height">75dp</dimen><!-- 55 + 20 -->
     <dimen name="wechat_login_button_height">@dimen/wechat_login_account_height</dimen>
 

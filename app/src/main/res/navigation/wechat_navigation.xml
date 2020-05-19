@@ -39,6 +39,11 @@
             app:exitAnim="@anim/wechat_slide_out_left"
             app:popEnterAnim="@anim/wechat_slide_in_left"
             app:popExitAnim="@anim/wechat_slide_out_right"/>
+        <action
+            android:id="@+id/wechat_action_login"
+            app:destination="@id/wechat_login_fragment"
+            app:popUpTo="@id/wechat_peers_list_fragment"
+            app:popUpToInclusive="true"/>
     </fragment>
     <fragment
         android:id="@+id/wechat_chat_fragment"

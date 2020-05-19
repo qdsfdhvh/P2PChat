@@ -6,6 +6,7 @@ import com.seiko.wechat.data.model.LogoBean
 import com.seiko.wechat.data.pref.PrefDataSource
 import com.seiko.wechat.util.constants.LOCAL_LOGO_LIST
 import com.seiko.wechat.util.extension.zipFlatMap
+import kotlinx.coroutines.delay
 
 class LoginViewModel(
     private val prefs: PrefDataSource
@@ -25,7 +26,8 @@ class LoginViewModel(
         }
     }
 
-    val userName: LiveData<String> = liveData {
+    val userName: LiveData<String> get() = liveData {
+        delay(200)
         emit(prefs.userName)
     }
 

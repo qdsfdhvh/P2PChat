@@ -12,9 +12,10 @@
         android:id="@id/wechat_logo"
         android:layout_width="@dimen/wechat_logo_size"
         android:layout_height="@dimen/wechat_logo_size"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="40dp"
         android:src="@drawable/wechat_iv_0"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/wechat_et_account_layout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
     <androidx.appcompat.widget.AppCompatTextView
@@ -29,16 +30,17 @@
         app:layout_constraintStart_toEndOf="@id/wechat_logo"/>
     <com.google.android.material.textfield.TextInputLayout
         android:id="@id/wechat_et_account_layout"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/wechat_login_account_layout_width"
         android:layout_height="@dimen/wechat_login_account_layout_height"
         android:layout_marginEnd="@dimen/wechat_login_margin"
         android:layout_marginStart="@dimen/wechat_login_margin"
-        android:layout_marginTop="40dp"
         android:gravity="bottom"
         android:theme="@style/WeChatTextInputLayoutTheme"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/wechat_logo">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/wechat_btn_login">
         <com.google.android.material.textfield.TextInputEditText
             style="@style/WeChatLoginInput"
             android:id="@id/wechat_et_account"
@@ -53,9 +55,11 @@
         android:id="@id/wechat_btn_login"
         android:layout_width="0dp"
         android:layout_height="@dimen/wechat_login_button_height"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="30dp"
         android:text="@string/wechat_login"
         app:layout_constraintTop_toBottomOf="@id/wechat_et_account_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/wechat_et_account_layout"
         app:layout_constraintEnd_toEndOf="@id/wechat_et_account_layout"/>
     <androidx.appcompat.widget.AppCompatTextView

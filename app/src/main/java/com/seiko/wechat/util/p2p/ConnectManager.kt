@@ -164,7 +164,7 @@ private suspend fun <I, T> Socket.receive(decoder: MesDecoder<I, T>): Flow<T> {
                 }
             }
         } catch (e: IOException) {
-            e.printStackTrace()
+            // java.net.SocketException: Socket closed
         }
     }.flowOn(Dispatchers.IO)
 }

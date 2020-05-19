@@ -7,12 +7,14 @@
     <item name="wechat_et_account_layout" type="id"/>
     <item name="wechat_et_account" type="id"/>
     <item name="wechat_btn_login" type="id"/>
+    <item name="wechat_description" type="id"/>
 
     <item name="wechat_toolbar" type="id"/>
     <item name="wechat_list" type="id"/>
     <item name="wechat_name" type="id"/>
     <item name="wechat_tv_title" type="id"/>
     <item name="wechat_btn_more" type="id"/>
+    <item name="wechat_btn_exit" type="id"/>
 
     <item name="wechat_btn_back" type="id"/>
     <item name="wechat_chat_text" type="id"/>

@@ -19,7 +19,15 @@
         style="@style/WeChatImageButton"
         android:id="@id/wechat_btn_more"
         android:src="@drawable/wechat_ic_add_circle_outline_black_24dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/wechat_tv_title"
+        app:layout_constraintBottom_toBottomOf="@id/wechat_tv_title"
+        app:layout_constraintEnd_toStartOf="@id/wechat_btn_exit"/>
+    <androidx.appcompat.widget.AppCompatImageButton
+        style="@style/WeChatImageButton"
+        android:id="@id/wechat_btn_exit"
+        android:src="@drawable/wechat_ic_exit_to_app_black_24dp"
+        app:layout_constraintTop_toTopOf="@id/wechat_tv_title"
+        app:layout_constraintBottom_toBottomOf="@id/wechat_tv_title"
         app:layout_constraintEnd_toEndOf="parent"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@id/wechat_list"

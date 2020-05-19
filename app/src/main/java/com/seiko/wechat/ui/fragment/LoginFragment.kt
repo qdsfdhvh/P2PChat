@@ -1,5 +1,6 @@
 package com.seiko.wechat.ui.fragment
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +29,16 @@ class LoginFragment : Fragment()
 
     private val viewModel: LoginViewModel by sharedViewModel()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().window?.let {
+            // 全屏绘制Layout
+            it.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            // 透明状态栏
+            it.statusBarColor = Color.TRANSPARENT
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -50,6 +61,8 @@ class LoginFragment : Fragment()
     }
 
     private fun setupUI() {
+        binding.root.fitsSystemWindows = true
+
         binding.wechatLogo.setOnClickListener(this)
         binding.wechatBtnLogin.setOnClickListener(this)
         binding.wechatEtAccount.setOnEditorActionListener { _, actionId, _ ->
@@ -65,8 +78,11 @@ class LoginFragment : Fragment()
             binding.wechatLogo.load(resId)
         }
         viewModel.userName.observe(viewLifecycleOwner) { name ->
-            binding.wechatEtAccount.takeIf { it.text.isNullOrEmpty()}
-                ?.setText(name)
+            binding.wechatEtAccount.takeIf { it.text.isNullOrEmpty()}?.let {
+                it.setText(name)
+                it.setSelection(name.length)
+                it.requestFocus()
+            }
         }
     }
 
