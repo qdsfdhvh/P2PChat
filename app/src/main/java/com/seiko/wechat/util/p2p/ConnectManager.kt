@@ -1,6 +1,7 @@
 package com.seiko.wechat.util.p2p
 
 import com.seiko.wechat.util.extension.filterTo
+import com.seiko.wechat.util.extension.safeClose
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -57,7 +58,7 @@ class ConnectManager<I, O, T>(private val adapter: MesAdapter<I, O, T>) : Corout
     @ExperimentalCoroutinesApi
     fun connect(targetIp: String): Flow<Boolean> {
         return flow {
-            if (outputClients.containsKey(targetIp)) {
+            if (isConnect(targetIp)) {
                 Timber.tag(TAG).d("已经连接客户端IP=$targetIp")
                 emit(true)
                 return@flow
@@ -109,7 +110,30 @@ class ConnectManager<I, O, T>(private val adapter: MesAdapter<I, O, T>) : Corout
             true
         } catch (e: SocketException) {
             Timber.tag(TAG).w(e)
+            close(targetIp) // 通讯异常，关闭通讯
             false
+        }
+    }
+
+    /**
+     * 目前设备是否处于连接状态
+     */
+    fun isConnect(targetIp: String): Boolean {
+        if (!outputClients.containsKey(targetIp)) {
+            return false
+        }
+        return outputClients[targetIp]?.isConnected ?: false
+    }
+
+    /**
+     * 关闭设备
+     * @param targetIp 设备IP
+     */
+    fun close(targetIp: String) {
+        val socket = outputClients.remove(targetIp)
+        if (socket != null) {
+            sinks.remove(targetIp)
+            socket.safeClose()
         }
     }
 

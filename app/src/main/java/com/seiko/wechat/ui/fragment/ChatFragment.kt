@@ -13,23 +13,19 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.seiko.wechat.R
-import com.seiko.wechat.data.db.model.ImageData
-import com.seiko.wechat.data.db.model.MessageBean
 import com.seiko.wechat.data.db.model.MessageData
 import com.seiko.wechat.data.db.model.TextData
-import com.seiko.wechat.data.model.PeerBean
 import com.seiko.wechat.databinding.WechatFragmentChatBinding
 import com.seiko.wechat.service.P2pChatService
 import com.seiko.wechat.ui.adapter.ChatAdapter
-import com.seiko.wechat.util.annotation.ItemType
 import com.seiko.wechat.util.bindService
 import com.seiko.wechat.util.extension.hideSoftInput
+import com.seiko.wechat.util.extension.collect
+import com.seiko.wechat.util.extension.onBackPressed
 import com.seiko.wechat.util.toast
 import com.seiko.wechat.vm.ChatViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ChatFragment : Fragment()
@@ -58,6 +54,11 @@ class ChatFragment : Fragment()
         super.onCreate(savedInstanceState)
         requireActivity().window?.setSoftInputMode(
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        hideSoftInput()
     }
 
     override fun onCreateView(
@@ -108,15 +109,23 @@ class ChatFragment : Fragment()
 
     private fun bindViewModel() {
         bindService<P2pChatService, P2pChatService.P2pBinder>()
-            .flatMapConcat { it.connect(peer) }
-            .onEach { success ->
-                if (success) {
-                    toast("${peer.name} 连接成功。")
-                } else {
-                    toast("${peer.name} 连接失败。")
-                }
+            .collect(lifecycleScope) { binder ->
+                binder.getState()
+                    .mapNotNull { it as? P2pChatService.State.PeersChange }
+                    .filter { !it.peers.contains(peer) }
+                    .collect(lifecycleScope) {
+                        requireActivity().onBackPressed()
+                        toast("对方关闭了聊天。")
+                    }
+                binder.connect(peer)
+                    .collect(lifecycleScope) { success ->
+                        if (success) {
+                            toast("${peer.name} 连接成功。")
+                        } else {
+                            toast("${peer.name} 连接失败。")
+                        }
+                    }
             }
-            .launchIn(lifecycleScope)
         viewModel.messageList.observe(viewLifecycleOwner) { list ->
             lifecycleScope.launchWhenResumed {
                 delay(200)
@@ -130,10 +139,7 @@ class ChatFragment : Fragment()
 
     override fun onClick(v: View?) {
         when(v?.id) {
-            R.id.wechat_btn_back -> {
-                hideSoftInput()
-                requireActivity().onBackPressed()
-            }
+            R.id.wechat_btn_back -> onBackPressed()
             R.id.wechat_btn_send -> sendText()
         }
     }

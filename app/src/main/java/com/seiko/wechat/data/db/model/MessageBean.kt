@@ -29,7 +29,7 @@ data class MessageBean(
     var time: Long = 0,
     // 消息状态 已发送 or 未发送 or Other
     @MessageState
-    val state: Int = MessageState.NORMAL,
+    var state: Int = MessageState.NORMAL,
     // 消息数据
     val data: MessageData = EmptyData
 ): Parcelable

@@ -15,6 +15,7 @@ import com.seiko.wechat.data.pref.PrefDataSource
 import com.seiko.wechat.data.repo.MessageRepository
 import com.seiko.wechat.util.annotation.ItemType
 import com.seiko.wechat.util.annotation.MessageState
+import com.seiko.wechat.util.extension.collect
 import com.seiko.wechat.util.extension.safeOffer
 import com.seiko.wechat.util.p2p.ConnectManager
 import com.seiko.wechat.util.p2p.LivePeerManager
@@ -97,6 +98,7 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
         var msg: MessageBean
         for (pair in channel) {
             ip = pair.first ; msg = pair.second
+            // 目前使用时间戳确定消息，更新状态
             if (connectManager.send(ip, msg)) {
                 messageRepo.updateState(msg.time, MessageState.POSTED)
             } else {
@@ -183,12 +185,19 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
      */
     private fun actionSendMessage(peer: PeerBean?, data: MessageData?) {
         if (peer == null || data == null) return
-        launch {
+        connectManager.connect(peer.address).collect(this) { success ->
             // 让本部保存的消息与发送的消息使用相同的时间戳，消息发送成功后一起更新状态
             val time = System.currentTimeMillis()
-            // 本地保存
+
+            // 本地保存, 如果未连接直接标记异常
             val sendBean = data.toSendBean(peer.uuid, time)
+            if (!success) {
+                sendBean.state = MessageState.ERROR
+            }
             messageRepo.saveMessage(sendBean)
+
+            // 如果对方设备通讯是断开的，不用发送
+            if (!success) return@collect
 
             // 发送
             val receiveBean = data.toReceiveBean(selfPeer.uuid, time)
@@ -230,6 +239,9 @@ private fun Peer.toBean(): PeerBean {
     )
 }
 
+/**
+ * data转成发送的msg，用于保存本地
+ */
 private fun MessageData.toSendBean(uuid: UUID, time: Long): MessageBean {
     return MessageBean(
         type = when(this) {
@@ -243,6 +255,9 @@ private fun MessageData.toSendBean(uuid: UUID, time: Long): MessageBean {
     )
 }
 
+/**
+ * data转成接收的msg，用于发送给对方
+ */
 private fun MessageData.toReceiveBean(uuid: UUID, time: Long): MessageBean {
     return MessageBean(
         type = when(this) {
