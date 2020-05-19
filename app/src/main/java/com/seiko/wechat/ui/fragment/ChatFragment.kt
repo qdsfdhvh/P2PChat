@@ -1,5 +1,6 @@
 package com.seiko.wechat.ui.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,12 +18,12 @@ import com.seiko.wechat.R
 import com.seiko.wechat.data.db.model.MessageData
 import com.seiko.wechat.data.db.model.TextData
 import com.seiko.wechat.databinding.WechatFragmentChatBinding
+import com.seiko.wechat.databinding.WechatViewMoreBinding
 import com.seiko.wechat.service.P2pChatService
 import com.seiko.wechat.ui.adapter.ChatAdapter
+import com.seiko.wechat.ui.widget.helper.ChatTranslationHelper
 import com.seiko.wechat.util.bindService
-import com.seiko.wechat.util.extension.hideSoftInput
-import com.seiko.wechat.util.extension.collect
-import com.seiko.wechat.util.extension.onBackPressed
+import com.seiko.wechat.util.extension.*
 import com.seiko.wechat.util.toast
 import com.seiko.wechat.vm.ChatViewModel
 import kotlinx.coroutines.channels.Channel
@@ -40,9 +42,21 @@ class ChatFragment : Fragment()
     private val binding get() = _binding!!
     private val bindingChat get() = binding.wechatViewChat
 
+//    private var _bindingMore: WechatViewMoreBinding? = null
+//    private val bindingMore: WechatViewMoreBinding
+//        get() {
+//            if (_bindingMore == null) {
+//                val view = binding.wechatViewMore.inflate()
+//                _bindingMore = WechatViewMoreBinding.bind(view)
+//            }
+//            return _bindingMore!!
+//        }
+    private val bindingMore get() = binding.wechatViewMore
+
     private val viewModel: ChatViewModel by viewModel()
 
     private lateinit var adapter: ChatAdapter
+    private lateinit var translationHelper: ChatTranslationHelper
 
     /**
      * 输入框是否有文本内容
@@ -97,6 +111,7 @@ class ChatFragment : Fragment()
     private fun setupUI() {
         binding.wechatBtnBack.setOnClickListener(this)
         bindingChat.wechatBtnSend.setOnClickListener(this)
+        bindingChat.wechatBtnMore.setOnClickListener(this)
 
         binding.wechatTvTitle.text = peer.name
         // 监听输入框变化
@@ -118,6 +133,7 @@ class ChatFragment : Fragment()
         adapter = ChatAdapter(requireActivity())
         binding.wechatList.adapter = adapter
 
+        translationHelper = ChatTranslationHelper(binding.container)
     }
 
     private fun bindViewModel() {
@@ -153,6 +169,7 @@ class ChatFragment : Fragment()
     override fun onClick(v: View?) {
         when(v?.id) {
             R.id.wechat_btn_back -> onBackPressed()
+            R.id.wechat_btn_more -> updateMoreLayoutVisibility()
             R.id.wechat_btn_send -> sendText()
         }
     }
@@ -162,6 +179,19 @@ class ChatFragment : Fragment()
             bindingChat.wechatBtnSend.visibility = View.VISIBLE
         } else {
             bindingChat.wechatBtnSend.visibility = View.GONE
+        }
+    }
+
+    /**
+     * 显示or隐藏 MoreLayout
+     */
+    private fun updateMoreLayoutVisibility() {
+        if (translationHelper.isMoreLayoutShown) {
+            translationHelper.hideBottomLayout()
+//            bindingMore.root.setGone()
+        } else {
+            translationHelper.showMoreLayout()
+//            bindingMore.root.setVisible()
         }
     }
 

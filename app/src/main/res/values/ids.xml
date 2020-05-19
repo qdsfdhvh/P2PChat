@@ -24,4 +24,9 @@
     <item name="wechat_btn_send" type="id"/>
     <item name="wechat_barrier" type="id"/>
     <item name="wechat_et_text" type="id"/>
+
+    <item name="wechat_btn_image" type="id"/>
+    <item name="wechat_btn_camera" type="id"/>
+    <item name="wechat_btn_location" type="id"/>
+    <item name="wechat_btn_folder" type="id"/>
 </resources>

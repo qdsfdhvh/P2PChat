@@ -26,4 +26,6 @@
 
     <dimen name="wechat_send_btn_width">60dp</dimen>
     <dimen name="wechat_send_btn_height">36dp</dimen>
+
+    <dimen name="wechat_more_img_btn_size">56dp</dimen>
 </resources>

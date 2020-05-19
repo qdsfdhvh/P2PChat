@@ -17,7 +17,8 @@
         android:label="@string/wechat_app_name"
         tools:ignore="MissingApplicationIcon">
         <activity android:name=".ui.MainActivity"
-            android:theme="@style/WeChatTheme">
+            android:theme="@style/WeChatTheme"
+            android:screenOrientation="fullSensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
