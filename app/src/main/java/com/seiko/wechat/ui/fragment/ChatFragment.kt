@@ -24,6 +24,8 @@ import com.seiko.wechat.util.extension.collect
 import com.seiko.wechat.util.extension.onBackPressed
 import com.seiko.wechat.util.toast
 import com.seiko.wechat.vm.ChatViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -42,6 +44,9 @@ class ChatFragment : Fragment()
 
     private lateinit var adapter: ChatAdapter
 
+    /**
+     * 输入框是否有文本内容
+     */
     private var hasText = false
         set(value) {
             if (field != value) {
@@ -49,6 +54,12 @@ class ChatFragment : Fragment()
                 updateSendVisibility()
             }
         }
+
+    private val actor = lifecycleScope.actor<Boolean>(capacity = Channel.CONFLATED) {
+        for (bool in channel) {
+            hasText = bool
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +99,7 @@ class ChatFragment : Fragment()
         binding.wechatTvTitle.text = peer.name
         // 监听输入框变化
         bindingChat.wechatEtText.addTextChangedListener(afterTextChanged = {
-            hasText = it?.toString().isNullOrBlank().not()
+            actor.offer(it?.toString().isNullOrBlank().not())
         })
         // 软键盘弹出，界面重绘时，聊天列表上滑
         binding.wechatList.addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->
@@ -145,14 +156,10 @@ class ChatFragment : Fragment()
     }
 
     private fun updateSendVisibility() {
-        view?.post {
-            if (hasText) {
-                bindingChat.wechatBtnSend.visibility = View.VISIBLE
-                bindingChat.wechatBtnMore.visibility = View.GONE
-            } else {
-                bindingChat.wechatBtnMore.visibility = View.VISIBLE
-                bindingChat.wechatBtnSend.visibility = View.GONE
-            }
+        if (hasText) {
+            bindingChat.wechatBtnSend.visibility = View.VISIBLE
+        } else {
+            bindingChat.wechatBtnSend.visibility = View.GONE
         }
     }
 
