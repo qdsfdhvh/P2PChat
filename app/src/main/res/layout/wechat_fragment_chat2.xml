@@ -37,18 +37,12 @@
             android:id="@+id/wechat_fill_all"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <LinearLayout
-                android:id="@+id/wechat_lly_all"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@id/wechat_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@id/wechat_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:listitem="@layout/wechat_item_chat_send_text"
-                    tools:itemCount="3"/>
-            </LinearLayout>
+                tools:listitem="@layout/wechat_item_chat_send_text"
+                tools:itemCount="3"/>
         </FrameLayout>
     </LinearLayout>
     <LinearLayout

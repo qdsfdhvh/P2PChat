@@ -1,28 +1,37 @@
 package com.seiko.wechat.ui.widget.helper
 
-import android.app.Activity
 import android.graphics.Rect
 import android.view.Gravity
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.PopupWindow
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import timber.log.Timber
 
 private typealias HeightListener = (Int) -> Unit
 
-class HeightProvider(private val activity: Activity): PopupWindow(activity)
-    , ViewTreeObserver.OnGlobalLayoutListener {
+class HeightProvider(
+    fragment: Fragment
+) : PopupWindow(fragment.requireActivity())
+    , ViewTreeObserver.OnGlobalLayoutListener
+    , LifecycleObserver {
 
-    private val rootView = View(activity)
     private var listener: HeightListener? = null
     private var maxHeight: Int = 0 // 记录Popup内容区的最大高度
     private var lastKeyboardHeight = -1
+    private val rect = Rect()
 
     init {
-        contentView = rootView
+        fragment.viewLifecycleOwner.lifecycle.addObserver(this)
+
+        contentView = View(fragment.requireActivity())
 
         // 监听全局Layout变化
-        rootView.viewTreeObserver.addOnGlobalLayoutListener(this)
+        contentView.viewTreeObserver.addOnGlobalLayoutListener(this)
 
         // 设置宽度为0, 高度为全屏
         width = 0
@@ -30,12 +39,11 @@ class HeightProvider(private val activity: Activity): PopupWindow(activity)
 
         // 设置键盘弹出方式
         softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
-        inputMethodMode = PopupWindow.INPUT_METHOD_NEEDED
+        inputMethodMode = INPUT_METHOD_NEEDED
     }
 
-    fun reset(listener: HeightListener?) {
+    fun show(view: View, listener: HeightListener?) {
         if (!isShowing) {
-            val view = activity.window.decorView
             view.post {
                 showAtLocation(view, Gravity.NO_GRAVITY, 0, 0)
             }
@@ -43,16 +51,17 @@ class HeightProvider(private val activity: Activity): PopupWindow(activity)
         this.listener = listener
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     override fun dismiss() {
         super.dismiss()
+        Timber.d("注销dismiss")
         listener = null
         maxHeight = 0
         lastKeyboardHeight = -1
     }
 
     override fun onGlobalLayout() {
-        val rect = Rect()
-        rootView.getWindowVisibleDisplayFrame(rect)
+        contentView.getWindowVisibleDisplayFrame(rect)
         if (rect.bottom > maxHeight) {
             maxHeight = rect.bottom
         }

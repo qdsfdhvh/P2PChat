@@ -11,6 +11,7 @@ fun UUID.toByteArray(): ByteArray {
     return bb.array()
 }
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun String.toUUID(): UUID {
     return UUID.fromString(this)
 }

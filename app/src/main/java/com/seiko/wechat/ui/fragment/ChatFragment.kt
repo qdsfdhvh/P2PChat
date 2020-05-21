@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.*
 import android.view.animation.TranslateAnimation
 import android.widget.LinearLayout
+import androidx.annotation.IdRes
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -27,7 +28,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -50,32 +50,32 @@ class ChatFragment : Fragment()
 
     private lateinit var adapter: ChatAdapter
 
-    private lateinit var heightProvider: HeightProvider
-
     private val rootHeight get() = binding.root.height
     private val toolbarHeight get() = binding.wechatBtnBack.height
     private val inputHeight get() = binding.wechatViewInput.root.height
-    private val listHeight get() = binding.wechatLlyAll.height
-    private val listY get() = binding.wechatLlyAll.y
-
-    private var isPanelOpen = false
-    private var isSoftOpen = true
-    private var softHeight = 0
-
-    /**
-     * 输入框是否有文本内容
-     */
-    private var hasText = false
+    private val listHeight get() = binding.wechatList.height
+    private var listY get() = binding.wechatList.y
         set(value) {
-            if (field != value) {
-                field = value
-                updateSendVisibility()
-            }
+            binding.wechatList.y = value
         }
 
-    private val actor = lifecycleScope.actor<Boolean>(capacity = Channel.CONFLATED) {
-        for (bool in channel) {
-            hasText = bool
+    private var isPanelOpen = false
+    private var isSoftOpen = false
+    private var softHeight = 0
+
+    private sealed class Action {
+        // 输入框是否有文本内容
+        data class HasText(val bool: Boolean): Action()
+    }
+
+    /**
+     * 行为队列
+     */
+    private val actor = lifecycleScope.actor<Action>(capacity = Channel.CONFLATED) {
+        for (action in channel) {
+            when(action) {
+                is Action.HasText -> updateSendVisibility(action.bool)
+            }
         }
     }
 
@@ -103,7 +103,6 @@ class ChatFragment : Fragment()
 
     override fun onDestroyView() {
         super.onDestroyView()
-        heightProvider.dismiss()
         _binding = null
     }
 
@@ -121,9 +120,15 @@ class ChatFragment : Fragment()
         bindingInput.wechatEtText.setOnClickListener(this)
 
         binding.wechatTvTitle.text = peer.name
+
+        binding.wechatList.setHasFixedSize(true)
+        binding.wechatList.layoutManager = LinearLayoutManager(requireActivity())
+        adapter = ChatAdapter(requireActivity())
+        binding.wechatList.adapter = adapter
+
         // 监听输入框变化
         bindingInput.wechatEtText.addTextChangedListener(afterTextChanged = {
-            actor.offer(it?.toString().isNullOrBlank().not())
+            actor.offer(Action.HasText(it?.toString().isNullOrBlank().not()))
         })
         // 界面变化是，滑动list
         binding.root.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
@@ -132,16 +137,8 @@ class ChatFragment : Fragment()
                 binding.wechatList.smoothScrollToPosition(adapter.itemCount - 1)
             }
         }
-
-        binding.wechatList.setHasFixedSize(true)
-        binding.wechatList.layoutManager = LinearLayoutManager(requireActivity())
-
-        adapter = ChatAdapter(requireActivity())
-        binding.wechatList.adapter = adapter
-
         // 创建一个0宽度的PopWindow通过其高度的变化，确定软键盘的尺寸及其显示or隐藏
-        heightProvider = HeightProvider(requireActivity())
-        heightProvider.reset { keyboardHeight ->
+        HeightProvider(this).show(binding.root) { keyboardHeight ->
             Timber.d("键盘高度=$keyboardHeight")
 
             val space = rootHeight - toolbarHeight - keyboardHeight - inputHeight
@@ -173,7 +170,7 @@ class ChatFragment : Fragment()
 
             if (!isPanelOpen || keyboardHeight > 0) {
                 binding.wechatContent.startAnimation(animation)
-                binding.wechatLlyAll.startAnimation(animationAll)
+                binding.wechatList.startAnimation(animationAll)
             }
 
             animation.setAnimationListener {
@@ -189,11 +186,11 @@ class ChatFragment : Fragment()
 
             animationAll.setAnimationListener {
                 if (keyboardHeight > 0) {
-                    binding.wechatLlyAll.clearAnimation()
-                    binding.wechatLlyAll.y += moveAll
+                    binding.wechatList.clearAnimation()
+                    listY += moveAll
                 } else if (!isPanelOpen) {
-                    binding.wechatLlyAll.clearAnimation()
-                    binding.wechatLlyAll.y = 0f
+                    binding.wechatList.clearAnimation()
+                    listY = 0f
 
                     val lp = binding.wechatFillAll.layoutParams as LinearLayout.LayoutParams
                     lp.bottomMargin = inputHeight
@@ -209,16 +206,15 @@ class ChatFragment : Fragment()
             }
             false
         }
-        bindingInput.wechatEtText.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-            val space = rootHeight - toolbarHeight - softHeight - inputHeight
-            var moveAll = 0
-            if (oldBottom > 0 && listHeight > space) {
-                moveAll = oldBottom - bottom
-                binding.wechatLlyAll.y += moveAll
-            }
-            Timber.d("switchPall: moveAll=$moveAll")
-        }
-
+//        bindingInput.wechatEtText.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+//            val space = rootHeight - toolbarHeight - softHeight - inputHeight
+//            var moveAll = 0
+//            if (oldBottom > 0 && listHeight > space) {
+//                moveAll = oldBottom - bottom
+//                binding.wechatList.y += moveAll
+//            }
+//            Timber.d("switchPall: moveAll=$moveAll")
+//        }
         binding.root.post {
             binding.wechatContent.y = bindingMore.root.height.toFloat()
         }
@@ -248,20 +244,19 @@ class ChatFragment : Fragment()
                 delay(200)
                 adapter.submitList(list) {
                     binding.wechatList.trySmoothScrollToPosition(list.size -1)
-//                    binding.root.postDelayed({
-//                        var space = 0
-//                        val fillSpace = rootHeight - inputHeight - toolbarHeight
-//                        if (isSoftOpen) {
-//                            space = rootHeight - inputHeight - softHeight - toolbarHeight
-//                        } else if (isPanelOpen) {
-//                            space = binding.wechatViewFill.height - toolbarHeight
-//                        }
-//
-//                        if (space in 1 until listHeight && listHeight < fillSpace) {
-//                            val move = space - listHeight
-//                            binding.wechatLlyAll.y = move.toFloat()
-//                        }
-//                    }, 100)
+                    binding.root.handler.postDelayed({
+                        var space = 0
+                        val fileSpace = rootHeight - inputHeight - toolbarHeight
+                        if (isSoftOpen) {
+                            space = rootHeight - inputHeight - toolbarHeight - softHeight
+                        } else if (isPanelOpen) {
+                           space = binding.wechatViewFill.height - toolbarHeight
+                        }
+                        if (space in 1 until listHeight && space < fileSpace) {
+                            val move = space - listHeight
+                            listY = move.toFloat()
+                        }
+                    }, 100)
                 }
             }
         }
@@ -271,31 +266,24 @@ class ChatFragment : Fragment()
     override fun onClick(v: View?) {
         when(v?.id) {
             R.id.wechat_btn_back -> onBackPressed()
-            R.id.wechat_btn_more -> {
-                isPanelOpen = true
-                v.isSelected = !v.isSelected
-                if (bindingInput.wechatBtnEmoji.isSelected) {
-                    bindingInput.wechatBtnEmoji.isSelected = false
-                }
-                Timber.d("onClick emoji=${bindingInput.wechatBtnEmoji.isSelected}, more=${bindingInput.wechatBtnMore.isSelected}")
-                switchPanel(v)
-            }
-            R.id.wechat_btn_emoji -> {
-                isPanelOpen = true
-                v.isSelected = !v.isSelected
-                if (bindingInput.wechatBtnMore.isSelected) {
-                    bindingInput.wechatBtnMore.isSelected = false
-                }
-                Timber.d("onClick emoji=${bindingInput.wechatBtnEmoji.isSelected}, more=${bindingInput.wechatBtnMore.isSelected}")
-                switchPanel(v)
-            }
-            R.id.wechat_btn_send -> {
-                sendText()
-            }
+            R.id.wechat_btn_more,
+            R.id.wechat_btn_emoji -> showPanelLayout(v)
+            R.id.wechat_btn_send -> sendText()
             R.id.wechat_et_text -> {
                 bindingInput.wechatBtnEmoji.isSelected = false
                 bindingInput.wechatBtnMore.isSelected = false
             }
+        }
+    }
+
+    /**
+     * 显示or隐藏 发送按钮
+     */
+    private fun updateSendVisibility(hasText: Boolean) {
+        if (hasText) {
+            bindingInput.wechatBtnSend.visibility = View.VISIBLE
+        } else {
+            bindingInput.wechatBtnSend.visibility = View.GONE
         }
     }
 
@@ -316,19 +304,63 @@ class ChatFragment : Fragment()
         P2pChatService.send(requireActivity(), peer, data)
     }
 
-    private fun updateSendVisibility() {
-        if (hasText) {
-            bindingInput.wechatBtnSend.visibility = View.VISIBLE
+    /**
+     * 显示or隐藏 底部Layout
+     */
+    private fun showPanelLayout(v: View) {
+        isPanelOpen = true
+        bindingInput.wechatBtnEmoji.isSelected(v.id)
+        bindingInput.wechatBtnMore.isSelected(v.id)
+        switchPanel(v)
+    }
+
+    /**
+     * 切换显示 底部Layout <=> 软键盘
+     */
+    private fun switchPanel(view: View) {
+        if (view.isSelected) {
+            Timber.d("显示面板")
+            bindingInput.wechatEtText.clearFocus()
+
+            val animation = createAnimation(ANIM_TIME, -binding.wechatContent.y)
+
+            val space = binding.wechatViewFill.height - toolbarHeight
+            var moveAll = 0f
+            if (listHeight > space) {
+                moveAll = space - listHeight - listY
+            }
+            Timber.d("switchPanel moveAll=$moveAll")
+            val animationAll = createAnimation(ANIM_TIME, moveAll)
+            if (isSoftOpen) {
+                hideSoftInput(bindingInput.wechatEtText)
+            }
+
+            animation.setAnimationListener {
+                binding.wechatContent.clearAnimation()
+                binding.wechatContent.y = 0f
+            }
+            animationAll.setAnimationListener {
+                if (!isSoftOpen) {
+                    binding.wechatList.clearAnimation()
+                    listY += moveAll
+                }
+            }
+            binding.wechatContent.startAnimation(animation)
+            binding.wechatList.startAnimation(animationAll)
         } else {
-            bindingInput.wechatBtnSend.visibility = View.GONE
+            Timber.d("显示键盘")
+            showSoftInput(bindingInput.wechatEtText)
         }
     }
 
+    /**
+     * 关闭底部Layout或软键盘
+     */
     private fun closePanelSoft() {
         bindingInput.wechatEtText.clearFocus()
 
         val animation = createAnimation(ANIM_TIME, binding.wechatViewMore.root.height)
-        val animationAll = createAnimation(ANIM_TIME, -binding.wechatLlyAll.y)
+        val animationAll = createAnimation(ANIM_TIME, -listY)
 
         if (isPanelOpen) {
             if (isSoftOpen) {
@@ -343,8 +375,8 @@ class ChatFragment : Fragment()
                 isPanelOpen = false
             }
             animationAll.setAnimationListener {
-                binding.wechatLlyAll.clearAnimation()
-                binding.wechatLlyAll.y = 0f
+                binding.wechatList.clearAnimation()
+                listY = 0f
                 Timber.d("onAnimationEnd: $inputHeight")
                 val lp = binding.wechatFillAll.layoutParams as LinearLayout.LayoutParams
                 lp.bottomMargin = inputHeight
@@ -352,51 +384,23 @@ class ChatFragment : Fragment()
                 binding.wechatList.smoothScrollToPosition(adapter.itemCount - 1)
             }
             binding.wechatContent.startAnimation(animation)
-            binding.wechatLlyAll.startAnimation(animationAll)
+            binding.wechatList.startAnimation(animationAll)
         } else {
             hideSoftInput(bindingInput.wechatEtText)
         }
 
         isSoftOpen = false
+        clearBtnSelect()
+    }
+
+    /**
+     * 重置所有界面的选中
+     */
+    private fun clearBtnSelect() {
         bindingInput.wechatBtnEmoji.isSelected = false
         bindingInput.wechatBtnMore.isSelected = false
     }
 
-    private fun switchPanel(view: View) {
-        if (view.isSelected) {
-            Timber.d("显示面板")
-            bindingInput.wechatEtText.clearFocus()
-
-            val animation = createAnimation(ANIM_TIME, -binding.wechatContent.y)
-
-            val space = binding.wechatViewFill.height - toolbarHeight
-            var moveAll = 0f
-            if (listHeight > space) {
-                moveAll = space - listHeight - binding.wechatLlyAll.y
-            }
-            Timber.d("switchPanel moveAll=$moveAll")
-            val animationAll = createAnimation(ANIM_TIME, moveAll)
-            if (isSoftOpen) {
-                hideSoftInput(bindingInput.wechatEtText)
-            }
-
-            animation.setAnimationListener {
-                binding.wechatContent.clearAnimation()
-                binding.wechatContent.y = 0f
-            }
-            animationAll.setAnimationListener {
-                if (!isSoftOpen) {
-                    binding.wechatLlyAll.clearAnimation()
-                    binding.wechatLlyAll.y += moveAll
-                }
-            }
-            binding.wechatContent.startAnimation(animation)
-            binding.wechatLlyAll.startAnimation(animationAll)
-        } else {
-            Timber.d("显示键盘")
-            showSoftInput(bindingInput.wechatEtText)
-        }
-    }
 }
 
 /**
@@ -426,6 +430,16 @@ private fun createAnimation(duration: Long, height: Float): TranslateAnimation {
     }
 }
 
+@Suppress("NOTHING_TO_INLINE")
 private inline fun createAnimation(duration: Long, height: Int): TranslateAnimation {
     return createAnimation(duration, height.toFloat())
+}
+
+/**
+ * 通过传入控件id，如果是自身就切换select状态，否则select=false
+ * @param id 控件id
+ */
+@Suppress("NOTHING_TO_INLINE")
+private inline fun View.isSelected(@IdRes id: Int) {
+    isSelected = this.id == id && !isSelected
 }
