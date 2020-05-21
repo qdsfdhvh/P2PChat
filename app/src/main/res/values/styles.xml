@@ -33,6 +33,7 @@
     <style name="WechatToolbarTitle">
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center_vertical</item>
     </style>
 
     <style name="WeChatPeerNameText">

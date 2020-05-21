@@ -38,14 +38,15 @@
         tools:listitem="@layout/wechat_item_chat_send_text"
         tools:itemCount="3"
         app:layout_constraintTop_toBottomOf="@id/wechat_btn_back"
-        app:layout_constraintBottom_toTopOf="@id/wechat_view_chat"
+        app:layout_constraintBottom_toTopOf="@id/wechat_view_input"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
     <include
-        android:id="@+id/wechat_view_chat"
-        layout="@layout/wechat_view_chat"
+        android:id="@+id/wechat_view_input"
+        layout="@layout/wechat_view_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="200dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/wechat_view_more"/>

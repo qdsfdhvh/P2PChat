@@ -38,7 +38,7 @@
         android:id="@id/wechat_btn_emoji"
         android:layout_gravity="end|center_vertical"
         android:layout_marginEnd="@dimen/wechat_spacing"
-        android:src="@drawable/wechat_ic_mood_black_24dp"
+        android:src="@drawable/wechat_selector_ic_emoji"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/wechat_et_text"
@@ -53,7 +53,7 @@
     <androidx.appcompat.widget.AppCompatImageButton
         style="@style/WeChatImageButton"
         android:id="@id/wechat_btn_more"
-        android:src="@drawable/wechat_ic_add_circle_outline_black_24dp"
+        android:src="@drawable/wechat_selector_ic_more"
         android:visibility="visible"
         tools:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"

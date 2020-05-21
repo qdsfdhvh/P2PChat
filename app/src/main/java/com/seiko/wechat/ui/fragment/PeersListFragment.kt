@@ -17,6 +17,7 @@ import com.seiko.wechat.databinding.WechatFragmentPeersListBinding
 import com.seiko.wechat.service.P2pChatService
 import com.seiko.wechat.ui.adapter.PeersAdapter
 import com.seiko.wechat.util.bindService
+import com.seiko.wechat.util.extension.collect
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -30,7 +31,9 @@ class PeersListFragment : Fragment()
     private var _binding: WechatFragmentPeersListBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var adapter: PeersAdapter
+    private var _adapter: PeersAdapter? = null
+    private val adapter get() = _adapter!!
+
     private lateinit var popWindow: PeersMenuPopup
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,11 +52,13 @@ class PeersListFragment : Fragment()
         savedInstanceState: Bundle?
     ): View? {
         _binding = WechatFragmentPeersListBinding.inflate(inflater, container, false)
+        _adapter = PeersAdapter(requireActivity())
         return binding.root
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        _adapter = null
         _binding = null
     }
 
@@ -76,7 +81,6 @@ class PeersListFragment : Fragment()
         binding.wechatList.setHasFixedSize(true)
         binding.wechatList.layoutManager = LinearLayoutManager(requireActivity())
 
-        adapter = PeersAdapter(requireActivity())
         adapter.setOnItemClickListener(object : PeersAdapter.OnItemClickListener {
             override fun onClick(peer: PeerBean) {
                 findNavController().navigate(PeersListFragmentDirections.wechatActionChat(peer))
@@ -88,7 +92,7 @@ class PeersListFragment : Fragment()
     private fun bindViewModel() {
         bindService<P2pChatService, P2pChatService.P2pBinder>()
             .flatMapConcat { it.getState() }
-            .onEach { state ->
+            .collect(lifecycleScope) { state ->
                 when(state) {
                     is P2pChatService.State.Started -> {
                         Timber.d("P2P聊天已开启")
@@ -102,7 +106,6 @@ class PeersListFragment : Fragment()
                     }
                 }
             }
-            .launchIn(lifecycleScope)
     }
 
     override fun onClick(v: View?) {

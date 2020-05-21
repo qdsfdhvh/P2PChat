@@ -11,7 +11,9 @@ import coil.api.load
 import com.seiko.wechat.data.model.PeerBean
 import com.seiko.wechat.databinding.WechatItemPeerBinding
 
-class PeersAdapter(context: Context) : ListAdapter<PeerBean, PeersAdapter.ItemViewHolder>(
+class PeersAdapter(
+    context: Context
+) : ListAdapter<PeerBean, PeersAdapter.ItemViewHolder>(
     DIFF_CALLBACK
 ) {
 
