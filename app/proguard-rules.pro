@@ -230,6 +230,15 @@
 #-dontwarn android.arch.lifecycle.**
 #-keep class android.arch.lifecycle.**{ *;}
 
+##########################################
+## PictureSelector
+##########################################
+-keep class com.luck.picture.lib.** { *; }
+#Ucrop
+-dontwarn com.yalantis.ucrop**
+-keep class com.yalantis.ucrop** { *; }
+-keep interface com.yalantis.ucrop** { *; }
+
 #########################################
 # App
 #########################################

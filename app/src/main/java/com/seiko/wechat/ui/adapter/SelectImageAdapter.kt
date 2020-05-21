@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.api.load
 import com.seiko.wechat.data.model.LogoBean
 import com.seiko.wechat.databinding.WechatItemUserLogoBinding
+import com.seiko.wechat.util.load
 
 class SelectImageAdapter(
     context: Context

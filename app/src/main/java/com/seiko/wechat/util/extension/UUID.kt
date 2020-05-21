@@ -1,6 +1,5 @@
 package com.seiko.wechat.util.extension
 
-import okio.Okio
 import java.nio.ByteBuffer
 import java.util.*
 

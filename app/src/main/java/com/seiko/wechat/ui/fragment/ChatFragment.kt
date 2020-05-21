@@ -1,7 +1,10 @@
 package com.seiko.wechat.ui.fragment
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.view.animation.TranslateAnimation
 import android.widget.LinearLayout
@@ -13,6 +16,8 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.luck.picture.lib.PictureSelector
+import com.luck.picture.lib.config.PictureConfig
 import com.seiko.wechat.R
 import com.seiko.wechat.data.db.model.MessageData
 import com.seiko.wechat.data.db.model.TextData
@@ -22,12 +27,14 @@ import com.seiko.wechat.ui.adapter.ChatAdapter
 import com.seiko.wechat.ui.widget.helper.HeightProvider
 import com.seiko.wechat.util.bindService
 import com.seiko.wechat.util.extension.*
+import com.seiko.wechat.util.openPictureSelect
 import com.seiko.wechat.util.toast
 import com.seiko.wechat.vm.ChatViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapNotNull
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -118,6 +125,7 @@ class ChatFragment : Fragment()
         bindingInput.wechatBtnEmoji.setOnClickListener(this)
         bindingInput.wechatBtnMore.setOnClickListener(this)
         bindingInput.wechatEtText.setOnClickListener(this)
+        bindingMore.wechatBtnImage.setOnClickListener(this)
 
         binding.wechatTvTitle.text = peer.name
 
@@ -134,7 +142,8 @@ class ChatFragment : Fragment()
         binding.root.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
             val position = adapter.itemCount - 1
             if (position >= 0) {
-                binding.wechatList.smoothScrollToPosition(adapter.itemCount - 1)
+
+                binding.wechatList.safeSmoothScrollToPosition(adapter.itemCount - 1)
             }
         }
         // 创建一个0宽度的PopWindow通过其高度的变化，确定软键盘的尺寸及其显示or隐藏
@@ -195,7 +204,7 @@ class ChatFragment : Fragment()
                     val lp = binding.wechatFillAll.layoutParams as LinearLayout.LayoutParams
                     lp.bottomMargin = inputHeight
                     binding.wechatFillAll.layoutParams = lp
-                    binding.wechatList.smoothScrollToPosition(adapter.itemCount - 1)
+                    binding.wechatList.safeSmoothScrollToPosition(adapter.itemCount - 1)
                 }
             }
         }
@@ -269,10 +278,8 @@ class ChatFragment : Fragment()
             R.id.wechat_btn_more,
             R.id.wechat_btn_emoji -> showPanelLayout(v)
             R.id.wechat_btn_send -> sendText()
-            R.id.wechat_et_text -> {
-                bindingInput.wechatBtnEmoji.isSelected = false
-                bindingInput.wechatBtnMore.isSelected = false
-            }
+            R.id.wechat_et_text -> clearBtnSelect()
+            R.id.wechat_btn_image -> openPictureSelect(PictureConfig.CHOOSE_REQUEST)
         }
     }
 
@@ -381,7 +388,7 @@ class ChatFragment : Fragment()
                 val lp = binding.wechatFillAll.layoutParams as LinearLayout.LayoutParams
                 lp.bottomMargin = inputHeight
                 binding.wechatFillAll.layoutParams = lp
-                binding.wechatList.smoothScrollToPosition(adapter.itemCount - 1)
+                binding.wechatList.safeSmoothScrollToPosition(adapter.itemCount - 1)
             }
             binding.wechatContent.startAnimation(animation)
             binding.wechatList.startAnimation(animationAll)
@@ -401,6 +408,35 @@ class ChatFragment : Fragment()
         bindingInput.wechatBtnMore.isSelected = false
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when(requestCode) {
+                PictureConfig.CHOOSE_REQUEST -> {
+                    // 图片选择结果回调
+                    val selectList = PictureSelector.obtainMultipleResult(data)
+                    // 例如 LocalMedia 里面返回五种path
+                    // 1.media.getPath(); 为原图path
+                    // 2.media.getCutPath();为裁剪后path，需判断media.isCut();是否为true
+                    // 3.media.getCompressPath();为压缩后path，需判断media.isCompressed();是否为true
+                    // 4.media.getOriginalPath()); media.isOriginal());为true时此字段才有值
+                    // 5.media.getAndroidQToPath();为Android Q版本特有返回的字段，此字段有值就用来做上传使用
+                    // 如果同时开启裁剪和压缩，则取压缩路径为准因为是先裁剪后压缩
+                    for (media in selectList) {
+                      Timber.i("是否压缩:%s", media.isCompressed)
+                      Timber.i("压缩:%s", media.compressPath)
+                      Timber.i("原图:%s", media.path)
+                      Timber.i("是否裁剪:%s", media.isCut)
+                      Timber.i("裁剪:%s", media.cutPath)
+                      Timber.i("是否开启原图:%s", media.isOriginal)
+                      Timber.i("原图路径:%s", media.originalPath)
+                      Timber.i("Android Q 特有Path:%s", media.androidQToPath)
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 /**
@@ -411,6 +447,13 @@ private fun RecyclerView.trySmoothScrollToPosition(position: Int) {
     if (childCount == 0) {
         scrollToPosition(position)
     } else {
+        smoothScrollToPosition(position)
+    }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun RecyclerView.safeSmoothScrollToPosition(position: Int) {
+    if (position >= 0) {
         smoothScrollToPosition(position)
     }
 }

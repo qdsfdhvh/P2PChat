@@ -46,6 +46,14 @@ android {
         exclude 'META-INF/atomicfu.kotlin_module'
     }
     resourcePrefix "wechat_" // 仅因个人需要
+    sourceSets {
+        main {
+            res.srcDirs = [
+                    'src/main/res-selector',
+                    'src/main/res'
+            ]
+        }
+    }
 }
 
 dependencies {
@@ -56,7 +64,7 @@ dependencies {
     implementation(Deps.support_appCompat)
     implementation(Deps.support_constraintLayout)
     implementation(Deps.support_preference)
-    implementation(Deps.support_preferencex)
+//    implementation(Deps.support_preferencex)
     implementation(Deps.support_lifecycle)
     implementation(Deps.support_lifecycleKtx)
     implementation(Deps.support_viewModel)
@@ -90,7 +98,8 @@ dependencies {
     implementation(Deps.log_timber)
 
     // 图片
-    implementation("io.coil-kt:coil:0.11.0")
+    implementation("com.github.bumptech.glide:glide:4.11.0")
+    implementation("com.github.LuckSiege.PictureSelector:picture_library:v2.5.6")
 
     // 圆角图片
     implementation("de.hdodenhof:circleimageview:3.0.0")
@@ -99,9 +108,9 @@ dependencies {
     implementation("top.zibin:Luban:1.1.8")
 
     // 内存泄漏
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.2'
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.2")
 
-    testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    testImplementation("junit:junit:4.13")
+    androidTestImplementation("androidx.test.ext:junit:1.1.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 }
