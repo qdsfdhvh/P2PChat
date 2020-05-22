@@ -129,7 +129,6 @@ class ChatFragment : Fragment()
 
         binding.wechatTvTitle.text = peer.name
 
-        binding.wechatList.setHasFixedSize(true)
         binding.wechatList.layoutManager = LinearLayoutManager(requireActivity())
         adapter = ChatAdapter(requireActivity())
         binding.wechatList.adapter = adapter
