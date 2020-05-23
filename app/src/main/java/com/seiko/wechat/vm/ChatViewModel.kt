@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import com.seiko.wechat.data.db.model.MessageBean
 import com.seiko.wechat.data.model.PeerBean
 import com.seiko.wechat.data.repo.MessageRepository
-import java.util.*
+import com.seiko.wechat.util.toDayFirstTimeMillis
 
 class ChatViewModel(private val repo: MessageRepository): ViewModel() {
 
@@ -22,16 +22,4 @@ class ChatViewModel(private val repo: MessageRepository): ViewModel() {
         _peer.value = peer
     }
 
-}
-
-/**
- * 今天0时0分0秒的时间戳
- */
-private fun toDayFirstTimeMillis(): Long {
-    val calendar = Calendar.getInstance()
-    calendar.set(Calendar.HOUR_OF_DAY, 0)
-    calendar.set(Calendar.MINUTE, 0)
-    calendar.set(Calendar.SECOND, 0)
-    calendar.set(Calendar.MILLISECOND, 0)
-    return calendar.timeInMillis
 }

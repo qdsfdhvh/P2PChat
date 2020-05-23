@@ -5,11 +5,9 @@ import android.net.TrafficStats
 import android.os.Build
 import android.os.StrictMode
 import android.os.strictmode.UntaggedSocketViolation
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.seiko.wechat.BuildConfig
 import com.seiko.wechat.util.timber.NanoDebugTree
-import com.seiko.wechat.work.PrefCheckWorker
+import com.seiko.wechat.work.WorkerHelper
 import com.tencent.mmkv.MMKV
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -31,8 +29,7 @@ class App : Application() {
             modules(appModule)
         }
 
-        val request = OneTimeWorkRequestBuilder<PrefCheckWorker>().build()
-        WorkManager.getInstance(this).enqueue(request)
+        WorkerHelper.init(this)
 
         setupStrictMode()
     }
