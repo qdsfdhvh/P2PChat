@@ -6,6 +6,8 @@ import com.seiko.wechat.data.db.WeChatDatabase
 import com.seiko.wechat.data.pref.PrefDataSource
 import com.seiko.wechat.data.pref.PrefDataSourceImpl
 import com.seiko.wechat.data.repo.MessageRepository
+import com.seiko.wechat.domain.SaveResourceUseCase
+import com.seiko.wechat.service.MessageAdapter
 import com.seiko.wechat.util.constants.APP_DB_NAME
 import com.seiko.wechat.util.constants.APP_PREF_NAME
 import com.seiko.wechat.util.helper.MmkvPreferenceDataStore
@@ -23,6 +25,10 @@ val appModule = module {
     single { createLoginDatabase(androidContext()) }
     // repo
     single { createMessageRepository(get()) }
+    // domain
+    single { SaveResourceUseCase() }
+    // other
+    single { MessageAdapter(get()) }
     // viewModel
     viewModel { LoginViewModel(get()) }
     viewModel { ChatViewModel(get()) }

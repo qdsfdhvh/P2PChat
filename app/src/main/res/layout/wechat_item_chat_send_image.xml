@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@id/wechat_logo"
+        android:layout_width="@dimen/wechat_chat_logo_size"
+        android:layout_height="@dimen/wechat_chat_logo_size"
+        android:layout_margin="@dimen/wechat_spacing"
+        android:layout_gravity="center"
+        android:src="@drawable/wechat_iv_0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@id/wechat_chat_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:minWidth="100dp"
+        tools:minHeight="100dp"
+        android:layout_marginBottom="@dimen/wechat_spacing"
+        app:layout_constraintTop_toTopOf="@id/wechat_logo"
+        app:layout_constraintEnd_toStartOf="@id/wechat_logo"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+    <ProgressBar
+        android:id="@+id/wechat_progress"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="@dimen/wechat_spacing"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/wechat_chat_image"
+        app:layout_constraintTop_toTopOf="@id/wechat_chat_image"
+        app:layout_constraintBottom_toBottomOf="@id/wechat_chat_image"/>
+    <ImageView
+        android:id="@+id/wechat_img_error"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="@dimen/wechat_spacing"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:tint="@android:color/holo_red_dark"
+        android:src="@drawable/wechat_ic_error_outline_black_24dp"
+        app:layout_constraintEnd_toStartOf="@id/wechat_chat_image"
+        app:layout_constraintTop_toTopOf="@id/wechat_chat_image"
+        app:layout_constraintBottom_toBottomOf="@id/wechat_chat_image"
+        tools:ignore="ContentDescription" />
+</androidx.constraintlayout.widget.ConstraintLayout>

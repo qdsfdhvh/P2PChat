@@ -27,6 +27,8 @@ import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.flow.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber
+import java.io.DataInputStream
+import java.io.DataOutputStream
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -109,10 +111,11 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
 
     private val prefDataSource: PrefDataSource by inject()
     private val messageRepo: MessageRepository by inject()
+    private val messageAdapter: MessageAdapter by inject()
 
     private lateinit var selfPeer: Peer
     private lateinit var peerManager: LivePeerManager
-    private val connectManager = ConnectManager(MessageAdapter())
+    private lateinit var connectManager: ConnectManager<DataInputStream, DataOutputStream, MessageBean>
 
     private val peers = ConcurrentHashMap<UUID, Peer>(10)
 
@@ -123,6 +126,7 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
         Timber.d("onCreate")
         selfPeer = Peer(uuid = UUID.fromString(prefDataSource.deviceUUID))
         peerManager = LivePeerManager(selfPeer)
+        connectManager = ConnectManager(messageAdapter)
         // 监听TCP服务
         launch {
             connectManager.stream()

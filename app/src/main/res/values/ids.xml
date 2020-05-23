@@ -17,13 +17,15 @@
     <item name="wechat_btn_exit" type="id"/>
 
     <item name="wechat_btn_back" type="id"/>
-    <item name="wechat_chat_text" type="id"/>
     <item name="wechat_btn_audio" type="id"/>
     <item name="wechat_btn_emoji" type="id"/>
     <item name="wechat_divider" type="id"/>
     <item name="wechat_btn_send" type="id"/>
     <item name="wechat_barrier" type="id"/>
     <item name="wechat_et_text" type="id"/>
+
+    <item name="wechat_chat_text" type="id"/>
+    <item name="wechat_chat_image" type="id"/>
 
     <item name="wechat_btn_image" type="id"/>
     <item name="wechat_btn_camera" type="id"/>
