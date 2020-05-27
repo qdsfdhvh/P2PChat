@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.StrictMode
 import android.os.strictmode.UntaggedSocketViolation
 import com.seiko.wechat.BuildConfig
+import com.seiko.wechat.util.fix.IMMLeaks
 import com.seiko.wechat.util.timber.NanoDebugTree
 import com.seiko.wechat.work.WorkerHelper
 import com.tencent.mmkv.MMKV
@@ -30,6 +31,8 @@ class App : Application() {
         }
 
         WorkerHelper.init(this)
+
+        IMMLeaks.fixFocusedViewLeak(this)
 
         setupStrictMode()
     }
