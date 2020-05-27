@@ -23,7 +23,7 @@ import com.seiko.wechat.data.db.model.ImageData
 import com.seiko.wechat.data.db.model.MessageBean
 import com.seiko.wechat.data.db.model.MessageData
 import com.seiko.wechat.data.db.model.TextData
-import com.seiko.wechat.databinding.WechatFragmentChat2Binding
+import com.seiko.wechat.databinding.WechatFragmentChatBinding
 import com.seiko.wechat.service.P2pChatService
 import com.seiko.wechat.ui.adapter.ChatAdapter
 import com.seiko.wechat.ui.widget.helper.HeightProvider
@@ -52,7 +52,7 @@ class ChatFragment : Fragment()
     private val args by navArgs<ChatFragmentArgs>()
     private val peer get() = args.peer
 
-    private var _binding: WechatFragmentChat2Binding? = null
+    private var _binding: WechatFragmentChatBinding? = null
     private val binding get() = _binding!!
     private val bindingInput get() = binding.wechatViewInput
     private val bindingMore get() = binding.wechatViewMore
@@ -108,7 +108,7 @@ class ChatFragment : Fragment()
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = WechatFragmentChat2Binding.inflate(inflater, container, false)
+        _binding = WechatFragmentChatBinding.inflate(inflater, container, false)
         return binding.root
     }
 

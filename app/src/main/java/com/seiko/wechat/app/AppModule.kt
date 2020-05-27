@@ -6,7 +6,7 @@ import com.seiko.wechat.data.db.WeChatDatabase
 import com.seiko.wechat.data.pref.PrefDataSource
 import com.seiko.wechat.data.pref.PrefDataSourceImpl
 import com.seiko.wechat.data.repo.MessageRepository
-import com.seiko.wechat.domain.SaveResourceUseCase
+import com.seiko.wechat.domain.GetResourceFileUseCase
 import com.seiko.wechat.service.MessageAdapter
 import com.seiko.wechat.util.constants.APP_DB_NAME
 import com.seiko.wechat.util.constants.APP_PREF_NAME
@@ -26,7 +26,7 @@ val appModule = module {
     // repo
     single { createMessageRepository(get()) }
     // domain
-    single { SaveResourceUseCase() }
+    single { GetResourceFileUseCase() }
     // other
     single { MessageAdapter(get()) }
     // viewModel

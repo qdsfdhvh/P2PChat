@@ -33,7 +33,7 @@
         app:layout_constraintEnd_toStartOf="@id/wechat_chat_image"
         app:layout_constraintTop_toTopOf="@id/wechat_chat_image"
         app:layout_constraintBottom_toBottomOf="@id/wechat_chat_image"/>
-    <ImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/wechat_img_error"
         android:layout_width="20dp"
         android:layout_height="20dp"

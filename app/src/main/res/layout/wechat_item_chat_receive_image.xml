@@ -22,7 +22,6 @@
         tools:minHeight="100dp"
         android:layout_marginBottom="@dimen/wechat_spacing"
         android:gravity="center_vertical"
-        app:corners="@dimen/wechat_corner"
         app:layout_constraintTop_toTopOf="@id/wechat_logo"
         app:layout_constraintStart_toEndOf="@id/wechat_logo"
         app:layout_constraintBottom_toBottomOf="parent"/>

@@ -25,10 +25,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.flow.*
+import okio.BufferedSink
+import okio.BufferedSource
 import org.koin.android.ext.android.inject
 import timber.log.Timber
-import java.io.DataInputStream
-import java.io.DataOutputStream
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -115,7 +115,7 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
 
     private lateinit var selfPeer: Peer
     private lateinit var peerManager: LivePeerManager
-    private lateinit var connectManager: ConnectManager<DataInputStream, DataOutputStream, MessageBean>
+    private lateinit var connectManager: ConnectManager<BufferedSource, BufferedSink, MessageBean>
 
     private val peers = ConcurrentHashMap<UUID, Peer>(10)
 

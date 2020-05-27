@@ -5,70 +5,86 @@ import com.seiko.wechat.data.db.model.ImageData
 import com.seiko.wechat.data.db.model.MessageBean
 import com.seiko.wechat.data.db.model.TextData
 import com.seiko.wechat.data.model.Result
-import com.seiko.wechat.domain.SaveResourceUseCase
+import com.seiko.wechat.domain.GetResourceFileUseCase
 import com.seiko.wechat.util.annotation.MessageType
 import com.seiko.wechat.util.extension.toUUID
-import com.seiko.wechat.util.getMd5Str
+import com.seiko.wechat.util.getMd5
 import com.seiko.wechat.util.p2p.MesAdapter
+import com.seiko.wechat.util.toHexString
+import okio.*
 import timber.log.Timber
 import java.io.*
+import java.lang.StringBuilder
 import java.net.Socket
+import java.util.*
 
 class MessageAdapter(
-    private val saveResource: SaveResourceUseCase
-) : MesAdapter<DataInputStream, DataOutputStream, MessageBean>() {
+    private val getResourceFile: GetResourceFileUseCase
+) : MesAdapter<BufferedSource, BufferedSink, MessageBean>() {
 
     companion object {
         private const val TAG = "MessageAdapter"
     }
 
-    override fun createSink(socket: Socket): DataOutputStream {
-        return socket.getOutputStream().data()
+    override fun createSource(socket: Socket): BufferedSource {
+        return socket.getInputStream().source().buffer()
     }
 
-    override fun createSource(socket: Socket): DataInputStream {
-        return socket.getInputStream().data()
+    override fun createSink(socket: Socket): BufferedSink {
+        return socket.getOutputStream().sink().buffer()
     }
 
-    override fun decode(source: DataInputStream): MessageBean? {
-        Timber.tag(TAG).d("解析数据...")
+    override fun decode(source: BufferedSource): MessageBean? {
 
         // version
         val version = source.readByte()
-        if (version != 1.toByte()) return null
         check(version == 1.toByte()) { "Only version v1 is supported" }
+        Timber.tag(TAG).d("read version = 1")
 
         // uuid
-        val uuid = source.readUTF().toUUID()
-        Timber.d("read uuid = $uuid")
+        val uuid = source.readUUID()
+        Timber.tag(TAG).d("read uuid = $uuid")
+
+        Timber.tag(TAG).d("解析数据3...")
 
         // time
         val time = source.readLong()
-        Timber.d("read time = $time")
+        Timber.tag(TAG).d("read time = $time")
 
         // type
         val type = source.readInt()
-        Timber.d("read type = $type")
+        Timber.tag(TAG).d("read type = $type")
 
         // data
         val data = when(source.readInt()) {
             MessageType.TEXT -> {
-                val text = source.readUTF()
-                Timber.d("read text: $text")
+                val text = source.readUtf8WithLength()
+                Timber.tag(TAG).d("read text: $text")
                 TextData(text = text)
             }
             MessageType.IMAGE -> {
-                val bytesLength = source.readInt()
-                Timber.d("read imageLength: $bytesLength")
-                val md5 = source.readUTF()
-                Timber.d("read imageMd5: $md5")
-                val bytes = receiveBytes(source, bytesLength)
-                val filePath = when(val result = saveResource.invoke(uuid, md5, bytes)) {
+
+                val fileLength = source.readLong()
+                Timber.tag(TAG).d("read imageLength: $fileLength")
+
+                val md5 = source.readMd5()
+                Timber.tag(TAG).d("read imageMd5: $md5")
+
+                val file = when(val result = getResourceFile.invoke(uuid, md5)) {
                     is Result.Success -> result.data
-                    is Result.Error -> return null
+                    is Result.Error -> {
+                        Timber.e(result.throwable)
+                        return null
+                    }
                 }
-                Timber.d("read image: $filePath")
-                ImageData(filePath)
+                file.deleteOnExit()
+
+                file.sink().buffer().use {
+                    it.write(source, fileLength)
+                }
+
+                Timber.tag(TAG).d("read image: ${file.absolutePath}")
+                ImageData(file.absolutePath)
             }
             else -> return null
         }
@@ -80,20 +96,20 @@ class MessageAdapter(
             data = data)
     }
 
-    override fun encode(sink: DataOutputStream, msg: MessageBean) {
+    override fun encode(sink: BufferedSink, msg: MessageBean) {
         Timber.tag(TAG).d("发送数据：${msg.data}")
 
         // version
         sink.writeByte(1)
-        Timber.d("write version = 1")
+        Timber.tag(TAG).d("write version = 1")
 
         // uuid
-        sink.writeUTF(msg.uuid.toString())
-        Timber.d("write uuid = ${msg.uuid}")
+        sink.writeUUID(msg.uuid)
+        Timber.tag(TAG).d("write uuid = ${msg.uuid}")
 
         // time
         sink.writeLong(msg.time)
-        Timber.d("write time = ${msg.time}")
+        Timber.tag(TAG).d("write time = ${msg.time}")
 
         // type
         sink.writeInt(msg.type)
@@ -103,20 +119,27 @@ class MessageAdapter(
             is EmptyData -> { /* no thing to do */ }
             is TextData -> {
                 sink.writeInt(MessageType.TEXT)
-                sink.writeUTF(data.text)
-                Timber.d("write text: ${data.text}")
+                sink.writeUtf8withLength(data.text)
+                Timber.tag(TAG).d("write text: ${data.text}")
             }
             is ImageData -> {
                 sink.writeInt(MessageType.IMAGE)
-                val bytes = File(data.imagePath).readBytes()
-                val bytesLength = bytes.size
-                sink.writeInt(bytesLength)
-                Timber.d("write imageLength: ${bytesLength}")
-                val md5 = bytes.getMd5Str()
-                sink.writeUTF(md5)
-                Timber.d("write imageMd5: $md5")
-                sendBytes(sink, bytes, bytesLength)
-                Timber.d("write image: ${data.imagePath}")
+
+                val file = File(data.imagePath)
+
+                val fileLength = file.length()
+                sink.writeLong(fileLength)
+                Timber.tag(TAG).d("write imageLength: $fileLength")
+
+                val md5 = file.getMd5()
+                sink.write(md5)
+                Timber.tag(TAG).d("write imageMd5: ${md5.toHexString()}")
+
+                file.source().buffer().use {
+                    sink.write(it, fileLength)
+                }
+                Timber.tag(TAG).d("write image: ${data.imagePath}")
+
             }
         }
 
@@ -124,52 +147,35 @@ class MessageAdapter(
     }
 }
 
-private inline fun InputStream.data(): DataInputStream {
-    return DataInputStream(this)
+@Suppress("NOTHING_TO_INLINE")
+private inline fun BufferedSink.writeUtf8withLength(text: String) {
+    writeInt(text.length)
+    writeUtf8(text)
 }
 
-private inline fun OutputStream.data(): DataOutputStream {
-    return DataOutputStream(this)
+@Suppress("NOTHING_TO_INLINE")
+private inline fun BufferedSource.readUtf8WithLength(): String {
+    val length = readInt()
+    return readUtf8(length.toLong())
 }
 
-private const val MAX_SEND_DATA = 30 * 1024 // 大约30Kb
-private const val MAX_FILE_SEND_DATA = 45 * 1024 * 1024 // 大约45Mb
+@Suppress("NOTHING_TO_INLINE")
+private inline fun BufferedSink.writeUUID(uuid: UUID) {
+    return writeUtf8withLength(uuid.toString())
+}
 
-/**
- * 发送数据
- */
-private fun sendBytes(output: OutputStream, bytes: ByteArray, bytesLength: Int) {
-    var start = 0
-    var end = 0
-    while(end < bytesLength) {
-        end += MAX_SEND_DATA
-        if (end >= bytesLength) {
-            end = bytesLength
-        }
-        output.write(bytes, start, end - start)
-        Timber.d("POST -> 数据传输中，offset=${end - start}, len=$bytesLength")
-        start = end
+@Suppress("NOTHING_TO_INLINE")
+private inline fun BufferedSource.readUUID(): UUID {
+    return readUtf8WithLength().toUUID()
+}
+
+private const val MD5_SIZE = 16
+
+@Suppress("NOTHING_TO_INLINE")
+private inline fun BufferedSource.readMd5(): String {
+    val md5 = StringBuilder(32)
+    for (i in 1 .. MD5_SIZE) {
+        md5.append(java.lang.String.format("%02x", readByte()))
     }
+    return md5.toString()
 }
-
-/**
- * 接收数据
- */
-private fun receiveBytes(input: InputStream, bytesLength: Int): ByteArray {
-    val os = ByteArrayOutputStream()
-
-    var bytesCopied: Long = 0
-    val buffer = ByteArray(MAX_SEND_DATA)
-    var bytes = input.read(buffer)
-    while (bytes >= 0) {
-        os.write(buffer, 0, bytes)
-        bytesCopied += bytes
-        if (bytesCopied >= bytesLength) {
-            break
-        }
-        Timber.d("GET <- 数据接收中，offset=$bytesCopied, len=$bytesLength")
-        bytes = input.read(buffer)
-    }
-    return os.toByteArray()
-}
-

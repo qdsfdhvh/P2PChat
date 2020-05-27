@@ -1,18 +1,11 @@
 package com.seiko.wechat.util
 
+import kotlinx.io.core.use
+import java.io.File
 import java.security.MessageDigest
 
 private  val md5Instance by lazy(LazyThreadSafetyMode.NONE) {
     MessageDigest.getInstance("MD5")
-}
-
-fun ByteArray.getMd5(): ByteArray {
-    md5Instance.update(this)
-    return md5Instance.digest()
-}
-
-fun ByteArray.getMd5Str(): String {
-    return getMd5().toHexString()
 }
 
 fun ByteArray.toHexString(): String {
@@ -25,4 +18,16 @@ fun ByteArray.toHexString(): String {
             append(if (low <= 9) '0' + low else 'a' - 10 + low)
         }
     }.toString()
+}
+
+fun File.getMd5(): ByteArray {
+    val buffer = ByteArray(1024)
+    inputStream().use {
+        var read = it.read(buffer)
+        while (read != -1) {
+            md5Instance.update(buffer, 0, read)
+            read = it.read(buffer)
+        }
+        return md5Instance.digest()
+    }
 }

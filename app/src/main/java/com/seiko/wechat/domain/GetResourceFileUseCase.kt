@@ -11,7 +11,7 @@ import java.util.*
 /**
  * 保存资源
  */
-class SaveResourceUseCase : KoinComponent {
+class GetResourceFileUseCase : KoinComponent {
 
     private val context: Context by inject()
 
@@ -20,7 +20,7 @@ class SaveResourceUseCase : KoinComponent {
      * @param md5 资源MD5
      * @param bytes 数据
      */
-    operator fun invoke(uuid: UUID, md5: String, bytes: ByteArray): Result<String> {
+    operator fun invoke(uuid: UUID, md5: String): Result<File> {
         val uuidDir = File(context.getResourceDir(), uuid.toString())
 
         val sp1 = md5.substring(0, 2)
@@ -32,12 +32,6 @@ class SaveResourceUseCase : KoinComponent {
         }
 
         val file = File(dir, sp2)
-        if (file.exists()) {
-            file.delete()
-        }
-
-        file.writeBytes(bytes)
-
-        return Result.Success(file.absolutePath)
+        return Result.Success(file)
     }
 }
