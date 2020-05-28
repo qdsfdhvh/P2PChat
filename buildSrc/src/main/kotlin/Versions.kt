@@ -1,6 +1,6 @@
 
 object Versions {
-    const val gradle = "3.6.1"
+    const val gradle = "4.0.0-rc01"
 
     const val multidex = "2.0.1"
     const val coreKtx = "1.2.0"
