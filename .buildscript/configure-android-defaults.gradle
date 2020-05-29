@@ -1,0 +1,26 @@
+android {
+    compileSdkVersion Build.compileSdk
+    buildToolsVersion Build.buildTools
+
+    defaultConfig {
+        minSdkVersion Build.minSdk
+        targetSdkVersion Build.targetSdk
+        versionCode Build.versionCode
+        versionName Build.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // See https://github.com/Kotlin/kotlinx.coroutines/issues/1064#issuecomment-479412940
+    packagingOptions {
+        exclude "META-INF/atomicfu.kotlin_module"
+        exclude "META-INF/kotlinx-io.kotlin_module"
+        exclude "META-INF/common.kotlin_module"
+        exclude "META-INF/android_debug.kotlin_module"
+        exclude "META-INF/android_release.kotlin_module"
+    }
+}

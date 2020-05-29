@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 buildscript {
     repositories {
         google()
@@ -5,9 +7,9 @@ buildscript {
         maven(url = "https://jitpack.io")
     }
     dependencies {
-        classpath(Deps.plugin_gradle)
-        classpath(Deps.plugin_kotlin)
-        classpath(Deps.plugin_navigation)
+        classpath(Deps.gradle)
+        classpath(Deps.navigationSafeArgs)
+        classpath(kotlin(module = "gradle-plugin", version = Versions.kotlin))
     }
 }
 
@@ -16,5 +18,11 @@ allprojects {
         google()
         jcenter()
         maven(url = "https://jitpack.io")
+    }
+
+    tasks.withType<KotlinCompile>() {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
 }
