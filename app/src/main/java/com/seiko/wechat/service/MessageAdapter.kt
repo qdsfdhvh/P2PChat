@@ -1,10 +1,10 @@
 package com.seiko.wechat.service
 
+import com.seiko.wechat.core.data.Result
 import com.seiko.wechat.data.db.model.EmptyData
 import com.seiko.wechat.data.db.model.ImageData
 import com.seiko.wechat.data.db.model.MessageBean
 import com.seiko.wechat.data.db.model.TextData
-import com.seiko.wechat.data.model.Result
 import com.seiko.wechat.domain.GetResourceFileUseCase
 import com.seiko.wechat.util.annotation.MessageType
 import com.seiko.wechat.util.extension.toUUID
@@ -73,7 +73,7 @@ class MessageAdapter(
                 val file = when(val result = getResourceFile.invoke(uuid, md5)) {
                     is Result.Success -> result.data
                     is Result.Error -> {
-                        Timber.e(result.throwable)
+                        Timber.e(result.error)
                         return null
                     }
                 }

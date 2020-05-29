@@ -13,14 +13,7 @@ abstract class BaseRepository {
             try {
                 Result.Success(apiCall.invoke())
             } catch (throwable: Throwable) {
-                when (throwable) {
-                    is IOException -> {
-                        Result.Error(message = throwable.message)
-                    }
-                    else -> {
-                        Result.Error(throwable.message)
-                    }
-                }
+                Result.Error(throwable)
             }
         }
     }

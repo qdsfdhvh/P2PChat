@@ -38,6 +38,14 @@ object Deps {
     const val navigationUi = "androidx.navigation:navigation-ui-ktx:${Versions.navigation}"
     const val navigationFragment = "androidx.navigation:navigation-fragment-ktx:${Versions.navigation}"
 
+//    const val composeCompiler = "androidx.compose:compose-compiler:${Versions.compose}"
+//    const val composeRuntime  = "androidx.compose:compose-runtime:${Versions.compose}"
+    const val uiFoundation = "androidx.ui:ui-foundation:${Versions.compose}"
+    const val uiLayout     = "androidx.ui:ui-layout:${Versions.compose}"
+    const val uiMaterial   = "androidx.ui:ui-material:${Versions.compose}"
+    const val uiSavedState = "androidx.ui:ui-saved-instance-state:${Versions.compose}"
+    const val uiTooling    = "androidx.ui:ui-tooling:${Versions.compose}"
+
     const val work = "androidx.work:work-runtime-ktx:${Versions.work}"
     const val mmkv = "com.tencent:mmkv-static:${Versions.mmkv}"
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"

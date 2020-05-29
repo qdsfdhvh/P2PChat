@@ -1,7 +1,7 @@
 package com.seiko.wechat.domain
 
 import android.content.Context
-import com.seiko.wechat.data.model.Result
+import com.seiko.wechat.core.data.Result
 import com.seiko.wechat.util.getResourceDir
 import org.koin.core.KoinComponent
 import org.koin.core.inject

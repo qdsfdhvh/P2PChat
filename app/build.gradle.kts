@@ -46,6 +46,8 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(project(":core:data"))
+    implementation(project(":core:feature"))
     AppDeps.implementation.forEach { dependency ->
         implementation(dependency)
     }

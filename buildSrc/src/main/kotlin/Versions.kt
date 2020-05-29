@@ -26,6 +26,7 @@ object Versions {
     const val timber = "4.7.1"
     const val glide = "4.11.0"
     const val okio = "2.6.0"
+    const val compose = "0.1.0-dev10"
 }
 
 object Build {
