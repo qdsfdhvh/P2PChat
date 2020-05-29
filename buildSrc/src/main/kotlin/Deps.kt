@@ -1,7 +1,7 @@
 object Deps {
     const val plugin_gradle = "com.android.tools.build:gradle:${Versions.gradle}"
     const val plugin_kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
-    const val plugin_navigation = "android.arch.navigation:navigation-safe-args-gradle-plugin:1.0.0"
+    const val plugin_navigation = "androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.navigation}"
 
     const val support_multidex = "androidx.multidex:multidex:${Versions.multidex}"
     const val support_coreKtx = "androidx.core:core-ktx:${Versions.coreKtx}"

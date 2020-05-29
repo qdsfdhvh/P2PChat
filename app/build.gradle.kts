@@ -1,63 +1,62 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'androidx.navigation.safeargs'
+plugins {
+    id("com.android.application")
+    kotlin("android")
+    kotlin("android.extensions")
+    kotlin("kapt")
+    id("androidx.navigation.safeargs.kotlin")
+}
 
 kapt {
     arguments {
-        arg("room.schemaLocation", "$projectDir/schemas".toString())
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 }
 
 android {
-    compileSdkVersion Build.compileSdk
-    buildToolsVersion Build.buildTools
+    compileSdkVersion(Build.compileSdk)
+    buildToolsVersion(Build.buildTools)
     defaultConfig {
-        applicationId Build.applicationId
-        minSdkVersion Build.minSdk
-        targetSdkVersion Build.targetSdk
-        versionCode Build.versionCode
-        versionName Build.versionName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
+        applicationId = Build.applicationId
+        minSdkVersion(Build.minSdk)
+        targetSdkVersion(Build.targetSdk)
+        versionCode = Build.versionCode
+        versionName = Build.versionName
+        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled = true
     }
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        getByName("release") {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    androidExtensions {
-        experimental = true
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    viewBinding {
-        enabled = true
+    buildFeatures {
+        viewBinding = true
     }
     packagingOptions {
-        exclude 'META-INF/kotlinx-io.kotlin_module'
-        exclude 'META-INF/atomicfu.kotlin_module'
+        exclude("META-INF/kotlinx-io.kotlin_module")
+        exclude("META-INF/atomicfu.kotlin_module")
     }
-    resourcePrefix "wechat_" // 仅因个人需要
     sourceSets {
-        main {
-            res.srcDirs = [
-                    'src/main/res-selector',
-                    'src/main/res'
-            ]
+        getByName("main") {
+            res.setSrcDirs(listOf(
+                "src/main/res-selector",
+                "src/main/res"
+            ))
         }
     }
+    resourcePrefix("wechat_") // 仅因个人需要
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation(Deps.support_multidex)
     implementation(Deps.support_coreKtx)
