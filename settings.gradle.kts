@@ -1,2 +1,6 @@
 rootProject.name="P2PChat"
-include(":app")
+include(
+    ":app",
+    ":core",
+    ":core:data"
+)
