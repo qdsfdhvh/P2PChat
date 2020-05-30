@@ -1,6 +1,6 @@
 
 object Versions {
-    const val gradle = "4.0.0-rc01"
+    const val gradle = "4.0.0"
 
     const val jUnit = "4.13"
     const val androidJUnitExt = "1.1.1"
@@ -26,7 +26,7 @@ object Versions {
     const val timber = "4.7.1"
     const val glide = "4.11.0"
     const val okio = "2.6.0"
-    const val compose = "0.1.0-dev10"
+    const val compose = "0.1.0-dev12"
 }
 
 object Build {

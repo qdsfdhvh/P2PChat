@@ -1,19 +1,23 @@
 package com.seiko.wechat.vm
 
 import androidx.lifecycle.*
-import com.seiko.wechat.R
+import com.seiko.wechat.core.resource.LOCAL_LOGO_LIST
 import com.seiko.wechat.data.model.LogoBean
 import com.seiko.wechat.data.pref.PrefDataSource
-import com.seiko.wechat.util.constants.LOCAL_LOGO_LIST
 import com.seiko.wechat.util.extension.zipFlatMap
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 class LoginViewModel(
     private val prefs: PrefDataSource
 ) : ViewModel() {
 
     val logoList: LiveData<List<LogoBean>> = liveData {
-        emit(LOCAL_LOGO_LIST)
+        val list = withContext(Dispatchers.Default) {
+            LOCAL_LOGO_LIST.map { LogoBean(it) }
+        }
+        emit(list)
     }
 
     private var _userLogoIndex = MutableLiveData<Int>().apply { value = prefs.userLogoIndex }

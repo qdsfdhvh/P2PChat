@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -48,11 +46,9 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core:data"))
     implementation(project(":core:feature"))
+    implementation(project(":core:resource"))
     AppDeps.implementation.forEach { dependency ->
         implementation(dependency)
-    }
-    AppDeps.kapt.forEach { dependency ->
-        kapt(dependency)
     }
     AppDeps.testImplementation.forEach { dependency ->
         testImplementation(dependency)
@@ -60,6 +56,11 @@ dependencies {
     AppDeps.androidTestImplementation.forEach { dependency ->
         androidTestImplementation(dependency)
     }
+
+    implementation(Deps.kotlinxIo)
+
+    implementation(Deps.room)
+    kapt(Deps.roomCompiler)
 
     // 图片选择
     implementation("com.github.LuckSiege.PictureSelector:picture_library:v2.5.6")

@@ -1,7 +1,9 @@
 rootProject.name="P2PChat"
 include(
     ":app",
+    ":compose",
     ":core",
     ":core:data",
-    ":core:feature"
+    ":core:feature",
+    ":core:resource"
 )

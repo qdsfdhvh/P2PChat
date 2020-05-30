@@ -7,10 +7,6 @@ object AppDeps {
         Deps.constraintLayout,
         Deps.recyclerview,
 
-        Deps.kotlinxIo,
-
-        Deps.room,
-
         Deps.navigation,
         Deps.navigationUi,
         Deps.navigationFragment,
@@ -20,10 +16,6 @@ object AppDeps {
         Deps.timber,
         Deps.glide,
         Deps.okio
-    )
-
-    val kapt = arrayOf(
-        Deps.roomCompiler
     )
 
     val testImplementation = arrayOf(
