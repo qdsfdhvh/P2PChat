@@ -1,4 +1,4 @@
-object DataDeps {
+object DepsCoreData {
     val api = arrayOf(
         Deps.kotlin,
         Deps.kotlinxCoroutines

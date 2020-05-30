@@ -5,11 +5,11 @@ plugins {
     kotlin("android")
 }
 
+apply(from = rootProject.file(".buildscript/configure-android-defaults.gradle"))
+
 android {
-    compileSdkVersion(Build.compileSdk)
     defaultConfig {
         applicationId = Build.applicationId + ".compose"
-        minSdkVersion(Build.minSdk)
     }
 }
 
@@ -19,13 +19,15 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
-    implementation(Deps.appCompat)
-
-    implementation(Deps.uiFoundation)
-    implementation(Deps.uiLayout)
-    implementation(Deps.uiMaterial)
-    implementation(Deps.uiTooling)
-
+    DepsCompose.implementation.forEach { dependency ->
+        implementation(dependency)
+    }
+    DepsCompose.testImplementation.forEach { dependency ->
+        testImplementation(dependency)
+    }
+    DepsCompose.androidTestImplementation.forEach { dependency ->
+        androidTestImplementation(dependency)
+    }
     implementation("com.github.mvarnagiris:compose-glide-image:0.3.6")
+    implementation("app.cash.contour:contour:0.1.7")
 }

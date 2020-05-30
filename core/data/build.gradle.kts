@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    DataDeps.api.forEach { dependency ->
+    DepsCoreData.api.forEach { dependency ->
         api(dependency)
     }
 }

@@ -1,21 +1,12 @@
-object AppDeps {
-
+object DepsApp {
     val implementation = arrayOf(
         Deps.multidex,
-
         Deps.preference,
         Deps.constraintLayout,
         Deps.recyclerview,
-
-        Deps.navigation,
-        Deps.navigationUi,
-        Deps.navigationFragment,
-
         Deps.work,
-        Deps.mmkv,
-        Deps.timber,
-        Deps.glide,
-        Deps.okio
+        Deps.kotlinxIo,
+        Deps.room
     )
 
     val testImplementation = arrayOf(

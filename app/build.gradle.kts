@@ -25,9 +25,6 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-//    kotlinOptions {
-//        jvmTarget = "1.8"
-//    }
     buildFeatures {
         viewBinding = true
     }
@@ -44,22 +41,15 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":core:data"))
-    implementation(project(":core:feature"))
-    implementation(project(":core:resource"))
-    AppDeps.implementation.forEach { dependency ->
+    DepsApp.implementation.forEach { dependency ->
         implementation(dependency)
     }
-    AppDeps.testImplementation.forEach { dependency ->
+    DepsApp.testImplementation.forEach { dependency ->
         testImplementation(dependency)
     }
-    AppDeps.androidTestImplementation.forEach { dependency ->
+    DepsApp.androidTestImplementation.forEach { dependency ->
         androidTestImplementation(dependency)
     }
-
-    implementation(Deps.kotlinxIo)
-
-    implementation(Deps.room)
     kapt(Deps.roomCompiler)
 
     // 图片选择

@@ -5,5 +5,6 @@ include(
     ":core",
     ":core:data",
     ":core:feature",
-    ":core:resource"
+    ":core:resource",
+    ":core:tools"
 )

@@ -24,3 +24,10 @@ android {
         exclude "META-INF/android_release.kotlin_module"
     }
 }
+
+dependencies {
+    implementation project(":core:data")
+    implementation project(":core:feature")
+    implementation project(":core:resource")
+    implementation project(":core:tools")
+}

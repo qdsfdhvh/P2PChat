@@ -9,9 +9,8 @@ android {
 
 dependencies {
     implementation(project(":core:data"))
-    DepsCoreFeature.api.forEach { dependency ->
-        api(dependency)
-    }
+    implementation(project(":core:feature"))
+    implementation(project(":core:resource"))
 }
 
 java {

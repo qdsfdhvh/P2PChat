@@ -1,4 +1,4 @@
-object FeatureDeps {
+object DepsCoreFeature {
     val api = arrayOf(
         Deps.appCompat,
         Deps.kotlinExtensions,
@@ -7,6 +7,13 @@ object FeatureDeps {
         Deps.androidLifecycle,
         Deps.androidLifecycleKtx,
         Deps.androidViewModel,
-        Deps.androidViewModelKtx
+        Deps.androidViewModelKtx,
+        Deps.navigation,
+        Deps.navigationUi,
+        Deps.navigationFragment,
+        Deps.mmkv,
+        Deps.timber,
+        Deps.glide,
+        Deps.okio
     )
 }
