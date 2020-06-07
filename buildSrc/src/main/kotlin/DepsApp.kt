@@ -5,8 +5,10 @@ object DepsApp {
         Deps.constraintLayout,
         Deps.recyclerview,
         Deps.work,
-        Deps.kotlinxIo,
-        Deps.room
+        Deps.room,
+        Deps.navigation,
+        Deps.navigationUi,
+        Deps.navigationFragment
     )
 
     val testImplementation = arrayOf(
