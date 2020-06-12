@@ -11,12 +11,6 @@ object Deps {
     const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
     const val recyclerview = "androidx.recyclerview:recyclerview:${Versions.recyclerview}"
 
-//    const val support_preferencex = "com.takisoft.preferencex:preferencex:${Versions.preference}"
-//    const val support_runtime = "androidx.lifecycle:lifecycle-runtime:${Versions.lifecycle}"
-//    const val support_runtimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}"
-//    const val support_pagingKtx = "androidx.paging:paging-runtime-ktx:${Versions.paging}"
-//    const val support_material = "com.google.android.material:material:${Versions.material}"
-
     const val androidLifecycle    = "androidx.lifecycle:lifecycle-livedata:${Versions.lifecycle}"
     const val androidLifecycleKtx = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle}"
     const val androidViewModel    = "androidx.lifecycle:lifecycle-viewmodel:${Versions.lifecycle}"
@@ -38,12 +32,9 @@ object Deps {
     const val navigationUi = "androidx.navigation:navigation-ui-ktx:${Versions.navigation}"
     const val navigationFragment = "androidx.navigation:navigation-fragment-ktx:${Versions.navigation}"
 
-//    const val composeCompiler = "androidx.compose:compose-compiler:${Versions.compose}"
-//    const val composeRuntime  = "androidx.compose:compose-runtime:${Versions.compose}"
     const val uiFoundation = "androidx.ui:ui-foundation:${Versions.compose}"
     const val uiLayout     = "androidx.ui:ui-layout:${Versions.compose}"
     const val uiMaterial   = "androidx.ui:ui-material:${Versions.compose}"
-    const val uiSavedState = "androidx.ui:ui-saved-instance-state:${Versions.compose}"
     const val uiTooling    = "androidx.ui:ui-tooling:${Versions.compose}"
 
     const val work = "androidx.work:work-runtime-ktx:${Versions.work}"

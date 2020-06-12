@@ -16,7 +16,12 @@ import kotlin.coroutines.CoroutineContext
 /**
  * 设备通讯管理 TCP连接
  */
-class ConnectManager<I, O, T>(private val adapter: MesAdapter<I, O, T>) : CoroutineScope {
+class ConnectManager<I, O, T>(
+    private val decoder: MesDecoder<I, T>,
+    private val encoder: MesEncoder<O, T>
+) : CoroutineScope {
+
+    constructor(adapter: MesAdapter<I, O, T>) : this(adapter, adapter)
 
     companion object {
         private const val TAG = "ConnectManager"
@@ -47,7 +52,7 @@ class ConnectManager<I, O, T>(private val adapter: MesAdapter<I, O, T>) : Corout
             .filterTo(inputClients) { it.ip }
             .flatMapMerge { socket ->
                 val ip = socket.ip
-                socket.receive(adapter).map { ip to it }
+                socket.receive(decoder).map { ip to it }
             }
     }
 
@@ -102,11 +107,11 @@ class ConnectManager<I, O, T>(private val adapter: MesAdapter<I, O, T>) : Corout
         var sink = sinks[targetIp]
         if (sink == null) {
             val socket = outputClients[targetIp] ?: return false
-            sink = adapter.createSink(socket)
+            sink = encoder.createSink(socket)
             sinks[targetIp] = sink
         }
         return try {
-            adapter.encode(sink!!, data)
+            encoder.encode(sink!!, data)
             true
         } catch (e: SocketException) {
             Timber.tag(TAG).w(e)
@@ -163,7 +168,7 @@ private suspend fun <I, T> Socket.receive(decoder: MesDecoder<I, T>): Flow<T> {
                     emit(data)
                 }
             }
-        } catch (e: IOException) {
+        } catch (ignored: IOException) {
             // java.net.SocketException: Socket closed
         }
     }.flowOn(Dispatchers.IO)
