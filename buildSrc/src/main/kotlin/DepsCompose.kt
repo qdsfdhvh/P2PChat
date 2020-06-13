@@ -4,7 +4,8 @@ object DepsCompose {
         Deps.uiFoundation,
         Deps.uiLayout,
         Deps.uiMaterial,
-        Deps.uiTooling
+        Deps.uiTooling,
+        Deps.uiLiveData
     )
 
     val testImplementation = arrayOf(

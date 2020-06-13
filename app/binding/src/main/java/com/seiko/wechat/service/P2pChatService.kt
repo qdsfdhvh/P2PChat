@@ -75,12 +75,16 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
     /**
      * 服务状态的Flow广播
      */
+    @ExperimentalCoroutinesApi
     private val stateChannel = ConflatedBroadcastChannel<State>()
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private val stateFlow = stateChannel.asFlow()
 
     /**
      * 当前服务状态
      */
+    @ExperimentalCoroutinesApi
     private var state: State = State.Stopped
         set(value) {
             if (field != value) {
@@ -92,6 +96,7 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
     /**
      * 消息队列
      */
+    @ObsoleteCoroutinesApi
     private val messageActor = actor<Pair<String, MessageBean>>(
         context = coroutineContext + Dispatchers.IO,
         capacity = Channel.BUFFERED
@@ -146,6 +151,7 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
         }
     }
 
+    @ExperimentalCoroutinesApi
     override fun onDestroy() {
         super.onDestroy()
         launch(NonCancellable) {
@@ -157,6 +163,8 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
         Timber.d("onDestroy")
     }
 
+    @ObsoleteCoroutinesApi
+    @ExperimentalCoroutinesApi
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when(intent?.action) {
             ACTION_READY -> {
@@ -187,6 +195,8 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
     /**
      * 给目标设备发送数据
      */
+    @ObsoleteCoroutinesApi
+    @ExperimentalCoroutinesApi
     private fun actionSendMessage(peer: PeerBean?, data: MessageData?) {
         if (peer == null || data == null) return
         connectManager.connect(peer.address).collect(this) { success ->
@@ -209,12 +219,18 @@ class P2pChatService : Service(), CoroutineScope by MainScope() {
         }
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     private val binder by lazy(LazyThreadSafetyMode.NONE) { P2pBinder() }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     override fun onBind(intent: Intent?): IBinder? {
         return binder
     }
 
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     inner class P2pBinder: Binder() {
 
         fun getState(): Flow<State> = stateFlow

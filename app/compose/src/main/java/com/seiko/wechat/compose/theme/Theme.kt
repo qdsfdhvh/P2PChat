@@ -1,4 +1,4 @@
-package com.seiko.wechat.theme
+package com.seiko.wechat.compose.theme
 
 import androidx.compose.Composable
 import androidx.ui.foundation.isSystemInDarkTheme
@@ -9,11 +9,22 @@ import androidx.ui.material.darkColorPalette
 import androidx.ui.material.lightColorPalette
 
 private val LightThemeColors = lightColorPalette(
-
+    primary = colorPrimary,
+    primaryVariant = colorPrimaryDark,
+    onPrimary = Color.White,
+    secondary = colorSecondPrimary,
+    secondaryVariant = colorSecondPrimary,
+    onSecondary = Color.White,
+    error = Red800
 )
 
 private val DarkThemeColors = darkColorPalette(
-
+    primary = Red300,
+    primaryVariant = Red700,
+    onPrimary = Color.Black,
+    secondary = Red300,
+    onSecondary = Color.White,
+    error = Red200
 )
 
 @Composable

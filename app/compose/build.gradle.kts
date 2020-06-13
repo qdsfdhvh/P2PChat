@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("com.android.application")
     kotlin("android")
+    kotlin("android.extensions")
+    kotlin("kapt")
 }
 
 apply(from = rootProject.file(".buildscript/configure-android-defaults.gradle"))
@@ -28,13 +30,4 @@ dependencies {
     DepsCompose.androidTestImplementation.forEach { dependency ->
         androidTestImplementation(dependency)
     }
-
-    // compose of glide
-    implementation("com.github.mvarnagiris:compose-glide-image:0.3.6")
-
-    // compose of constraintLayout
-    implementation("app.cash.contour:contour:0.1.7")
-
-    // compose of navigation
-    implementation("com.github.mvarnagiris.compose-navigation:navigation:0.3.1")
 }

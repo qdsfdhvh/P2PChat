@@ -1,4 +1,4 @@
-package com.seiko.wechat.theme
+package com.seiko.wechat.compose.theme
 
 import androidx.ui.material.Typography
 import androidx.ui.text.TextStyle

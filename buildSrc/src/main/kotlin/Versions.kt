@@ -12,12 +12,12 @@ object Versions {
     const val constraintLayout = "1.1.3"
     const val recyclerview = "1.1.0"
     const val lifecycle = "2.2.0"
-//    const val paging = "2.1.1"
-//    const val material = "1.1.0"
+
     const val kotlin = "1.3.72"
     const val kotlinExtensions = "1.2.0"
     const val kotlinxCoroutines = "1.3.5"
     const val kotlinxIo = "0.1.6"
+
     const val koin = "2.1.5"
     const val room = "2.2.5"
     const val navigation = "2.2.2"
@@ -26,7 +26,7 @@ object Versions {
     const val timber = "4.7.1"
     const val glide = "4.11.0"
     const val okio = "2.6.0"
-    const val compose = "0.1.0-dev12"
+    const val compose = "0.1.0-dev13"
 }
 
 object Build {
