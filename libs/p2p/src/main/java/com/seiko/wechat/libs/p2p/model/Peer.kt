@@ -1,8 +1,8 @@
-package com.seiko.wechat.p2p.model
+package com.seiko.wechat.libs.p2p.model
 
-import com.seiko.wechat.p2p.extensions.toAddress
-import com.seiko.wechat.p2p.extensions.toByteArray
-import com.seiko.wechat.p2p.extensions.toUUID
+import com.seiko.wechat.libs.p2p.extensions.toAddress
+import com.seiko.wechat.libs.p2p.extensions.toByteArray
+import com.seiko.wechat.libs.p2p.extensions.toUUID
 import kotlinx.io.core.*
 import java.net.Inet4Address
 import java.util.*

@@ -8,5 +8,6 @@ include(
     ":core:feature",
     ":core:resource",
     ":libs",
-    ":libs:p2p"
+    ":libs:p2p",
+    ":libs:picture-selector"
 )

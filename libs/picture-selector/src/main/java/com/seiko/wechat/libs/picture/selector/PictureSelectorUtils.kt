@@ -1,5 +1,6 @@
-package com.seiko.wechat.util
+package com.seiko.wechat.libs.picture.selector
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import androidx.fragment.app.Fragment
 import com.luck.picture.lib.PictureSelector
@@ -8,8 +9,6 @@ import com.luck.picture.lib.config.PictureConfig
 import com.luck.picture.lib.config.PictureMimeType
 import com.luck.picture.lib.style.PictureWindowAnimationStyle
 import com.luck.picture.lib.tools.SdkVersionUtils
-import com.seiko.wechat.R
-import com.seiko.wechat.util.helper.GlideEngine
 
 fun Fragment.openPictureSelect(requestCode: Int) {
     PictureSelector.create(this)
@@ -94,4 +93,33 @@ fun Fragment.openPictureSelect(requestCode: Int) {
         //.videoQuality()// 视频录制质量 0 or 1
         //.forResult(PictureConfig.CHOOSE_REQUEST);//结果回调onActivityResult code
         .forResult(requestCode)
+}
+
+data class PictureBean(
+    val path: String,
+    val cutPath: String?,
+    val compressPath: String?,
+    val originalPath: String?,
+    val androidQToPath: String?
+)
+
+fun obtainMultipleResult(data: Intent?): List<PictureBean>? {
+    val selectList = PictureSelector.obtainMultipleResult(data)
+    // 例如 LocalMedia 里面返回五种path
+    // 1.media.getPath(); 为原图path
+    // 2.media.getCutPath();为裁剪后path，需判断media.isCut();是否为true
+    // 3.media.getCompressPath();为压缩后path，需判断media.isCompressed();是否为true
+    // 4.media.getOriginalPath()); media.isOriginal());为true时此字段才有值
+    // 5.media.getAndroidQToPath();为Android Q版本特有返回的字段，此字段有值就用来做上传使用
+    // 如果同时开启裁剪和压缩，则取压缩路径为准因为是先裁剪后压缩
+    if (selectList.isEmpty()) return null
+    return selectList.map { media ->
+        PictureBean(
+            path = media.path,
+            cutPath = media.cutPath,
+            compressPath = media.compressPath,
+            originalPath = media.originalPath,
+            androidQToPath = media.androidQToPath
+        )
+    }
 }

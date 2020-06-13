@@ -7,9 +7,9 @@ import com.seiko.wechat.data.db.model.MessageBean
 import com.seiko.wechat.data.db.model.TextData
 import com.seiko.wechat.domain.GetResourceFileUseCase
 import com.seiko.wechat.util.annotation.MessageType
-import com.seiko.wechat.p2p.extensions.toUUID
+import com.seiko.wechat.libs.p2p.extensions.toUUID
 import com.seiko.wechat.util.getMd5
-import com.seiko.wechat.p2p.MesAdapter
+import com.seiko.wechat.libs.p2p.MesAdapter
 import com.seiko.wechat.util.toHexString
 import okio.*
 import timber.log.Timber

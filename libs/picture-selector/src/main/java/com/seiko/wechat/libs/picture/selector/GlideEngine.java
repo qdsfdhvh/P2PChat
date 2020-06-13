@@ -1,4 +1,4 @@
-package com.seiko.wechat.util.helper;
+package com.seiko.wechat.libs.picture.selector;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,7 +22,6 @@ import com.luck.picture.lib.tools.MediaUtils;
 import com.luck.picture.lib.widget.longimage.ImageSource;
 import com.luck.picture.lib.widget.longimage.ImageViewState;
 import com.luck.picture.lib.widget.longimage.SubsamplingScaleImageView;
-import com.seiko.wechat.R;
 
 /**
  * @author luck
@@ -35,7 +34,9 @@ public class GlideEngine implements ImageEngine {
      * 加载图片
      */
     @Override
-    public void loadImage(@NonNull Context context, @NonNull String url, @NonNull ImageView imageView) {
+    public void loadImage(final @NonNull Context context,
+                          final @NonNull String url,
+                          final @NonNull ImageView imageView) {
         Glide.with(context)
                 .load(url)
                 .into(imageView);
@@ -47,9 +48,11 @@ public class GlideEngine implements ImageEngine {
      * @param callback      网络图片加载回调监听 {link after version 2.5.1 Please use the #OnImageCompleteCallback#}
      */
     @Override
-    public void loadImage(@NonNull Context context, @NonNull String url,
-                          @NonNull ImageView imageView,
-                          SubsamplingScaleImageView longImageView, OnImageCompleteCallback callback) {
+    public void loadImage(final @NonNull Context context,
+                          final @NonNull String url,
+                          final @NonNull ImageView imageView,
+                          final SubsamplingScaleImageView longImageView,
+                          final OnImageCompleteCallback callback) {
         Glide.with(context)
                 .asBitmap()
                 .load(url)
@@ -105,9 +108,10 @@ public class GlideEngine implements ImageEngine {
      * @ 已废弃
      */
     @Override
-    public void loadImage(@NonNull Context context, @NonNull String url,
-                          @NonNull ImageView imageView,
-                          SubsamplingScaleImageView longImageView) {
+    public void loadImage(final @NonNull Context context,
+                          final @NonNull String url,
+                          final @NonNull ImageView imageView,
+                          final SubsamplingScaleImageView longImageView) {
         Glide.with(context)
                 .asBitmap()
                 .load(url)
@@ -146,7 +150,9 @@ public class GlideEngine implements ImageEngine {
      * @param imageView 承载图片ImageView
      */
     @Override
-    public void loadFolderImage(@NonNull Context context, @NonNull String url, @NonNull ImageView imageView) {
+    public void loadFolderImage(final @NonNull Context context,
+                                final @NonNull String url,
+                                final @NonNull ImageView imageView) {
         Glide.with(context)
                 .asBitmap()
                 .load(url)
@@ -175,8 +181,9 @@ public class GlideEngine implements ImageEngine {
      * @param imageView 承载图片ImageView
      */
     @Override
-    public void loadAsGifImage(@NonNull Context context, @NonNull String url,
-                               @NonNull ImageView imageView) {
+    public void loadAsGifImage(final @NonNull Context context,
+                               final @NonNull String url,
+                               final @NonNull ImageView imageView) {
         Glide.with(context)
                 .asGif()
                 .load(url)
@@ -191,7 +198,9 @@ public class GlideEngine implements ImageEngine {
      * @param imageView 承载图片ImageView
      */
     @Override
-    public void loadGridImage(@NonNull Context context, @NonNull String url, @NonNull ImageView imageView) {
+    public void loadGridImage(final @NonNull Context context,
+                              final @NonNull String url,
+                              final @NonNull ImageView imageView) {
         Glide.with(context)
                 .load(url)
                 .override(200, 200)
@@ -200,20 +209,15 @@ public class GlideEngine implements ImageEngine {
                 .into(imageView);
     }
 
-
     private GlideEngine() {
+
     }
 
-    private static GlideEngine instance;
+    private final static class Holder {
+        private final static GlideEngine instance = new GlideEngine();
+    }
 
     public static GlideEngine createGlideEngine() {
-        if (null == instance) {
-            synchronized (GlideEngine.class) {
-                if (null == instance) {
-                    instance = new GlideEngine();
-                }
-            }
-        }
-        return instance;
+        return Holder.instance;
     }
 }

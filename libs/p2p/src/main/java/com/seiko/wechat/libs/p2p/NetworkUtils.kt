@@ -1,4 +1,4 @@
-package com.seiko.wechat.p2p
+package com.seiko.wechat.libs.p2p
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

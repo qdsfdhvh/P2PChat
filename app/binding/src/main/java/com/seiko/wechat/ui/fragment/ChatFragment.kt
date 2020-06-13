@@ -15,22 +15,21 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.luck.picture.lib.PictureSelector
-import com.luck.picture.lib.config.PictureConfig
-import com.luck.picture.lib.entity.LocalMedia
 import com.seiko.wechat.R
 import com.seiko.wechat.data.db.model.ImageData
 import com.seiko.wechat.data.db.model.MessageBean
 import com.seiko.wechat.data.db.model.MessageData
 import com.seiko.wechat.data.db.model.TextData
 import com.seiko.wechat.databinding.WechatFragmentChatBinding
+import com.seiko.wechat.libs.picture.selector.PictureBean
+import com.seiko.wechat.libs.picture.selector.obtainMultipleResult
+import com.seiko.wechat.libs.picture.selector.openPictureSelect
 import com.seiko.wechat.service.P2pChatService
 import com.seiko.wechat.ui.adapter.ChatAdapter
 import com.seiko.wechat.ui.widget.helper.HeightProvider
 import com.seiko.wechat.util.bindService
 import com.seiko.wechat.util.extension.*
 import com.seiko.wechat.util.openFile
-import com.seiko.wechat.util.openPictureSelect
 import com.seiko.wechat.util.toast
 import com.seiko.wechat.vm.ChatViewModel
 import kotlinx.coroutines.channels.Channel
@@ -47,6 +46,7 @@ class ChatFragment : Fragment()
 
     companion object {
         private const val ANIM_TIME = 300L
+        private const val CHOOSE_REQUEST = 0x188
     }
 
     private val args by navArgs<ChatFragmentArgs>()
@@ -283,7 +283,7 @@ class ChatFragment : Fragment()
             R.id.wechat_btn_emoji -> showPanelLayout(v)
             R.id.wechat_btn_send -> sendText()
             R.id.wechat_et_text -> clearBtnSelect()
-            R.id.wechat_btn_image -> openPictureSelect(PictureConfig.CHOOSE_REQUEST)
+            R.id.wechat_btn_image -> openPictureSelect(CHOOSE_REQUEST)
         }
     }
 
@@ -308,6 +308,7 @@ class ChatFragment : Fragment()
     /**
      * 发送文本
      */
+    @SuppressLint("SetTextI18n")
     private fun sendText() {
         val text = bindingInput.wechatEtText.text.toString()
         if (text.isEmpty()) return
@@ -318,23 +319,8 @@ class ChatFragment : Fragment()
     /**
      * 发送图片
      */
-    private fun sendImages(medias: List<LocalMedia>) {
-        // 例如 LocalMedia 里面返回五种path
-        // 1.media.getPath(); 为原图path
-        // 2.media.getCutPath();为裁剪后path，需判断media.isCut();是否为true
-        // 3.media.getCompressPath();为压缩后path，需判断media.isCompressed();是否为true
-        // 4.media.getOriginalPath()); media.isOriginal());为true时此字段才有值
-        // 5.media.getAndroidQToPath();为Android Q版本特有返回的字段，此字段有值就用来做上传使用
-        // 如果同时开启裁剪和压缩，则取压缩路径为准因为是先裁剪后压缩
+    private fun sendImages(medias: List<PictureBean>) {
         for (media in medias) {
-//            Timber.i("是否压缩:%s", media.isCompressed)
-//            Timber.i("压缩:%s", media.compressPath)
-//            Timber.i("原图:%s", media.path)
-//            Timber.i("是否裁剪:%s", media.isCut)
-//            Timber.i("裁剪:%s", media.cutPath)
-//            Timber.i("是否开启原图:%s", media.isOriginal)
-//            Timber.i("原图路径:%s", media.originalPath)
-//            Timber.i("Android Q 特有Path:%s", media.androidQToPath)
             val data = ImageData(media.path)
             sendMsg(data)
         }
@@ -448,9 +434,9 @@ class ChatFragment : Fragment()
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when(requestCode) {
-                PictureConfig.CHOOSE_REQUEST -> {
+                CHOOSE_REQUEST -> {
                     // 图片选择结果回调
-                    val selectList = PictureSelector.obtainMultipleResult(data)
+                    val selectList = obtainMultipleResult(data) ?: return
                     sendImages(selectList)
                 }
             }

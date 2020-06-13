@@ -1,4 +1,4 @@
-package com.seiko.wechat.p2p.extensions
+package com.seiko.wechat.libs.p2p.extensions
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform

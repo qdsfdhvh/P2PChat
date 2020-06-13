@@ -1,7 +1,7 @@
-package com.seiko.wechat.p2p
+package com.seiko.wechat.libs.p2p
 
-import com.seiko.wechat.p2p.extensions.filterTo
-import com.seiko.wechat.p2p.extensions.safeClose
+import com.seiko.wechat.libs.p2p.extensions.filterTo
+import com.seiko.wechat.libs.p2p.extensions.safeClose
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber

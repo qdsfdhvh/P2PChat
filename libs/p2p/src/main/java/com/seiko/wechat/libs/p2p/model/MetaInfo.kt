@@ -1,4 +1,4 @@
-package com.seiko.wechat.p2p.model
+package com.seiko.wechat.libs.p2p.model
 
 import kotlinx.io.core.*
 

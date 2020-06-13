@@ -16,9 +16,9 @@ import com.seiko.wechat.data.repo.MessageRepository
 import com.seiko.wechat.util.annotation.ItemType
 import com.seiko.wechat.util.annotation.MessageState
 import com.seiko.wechat.util.extension.safeOffer
-import com.seiko.wechat.p2p.ConnectManager
-import com.seiko.wechat.p2p.LivePeerManager
-import com.seiko.wechat.p2p.model.Peer
+import com.seiko.wechat.libs.p2p.ConnectManager
+import com.seiko.wechat.libs.p2p.LivePeerManager
+import com.seiko.wechat.libs.p2p.model.Peer
 import com.seiko.wechat.util.extension.collect
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel

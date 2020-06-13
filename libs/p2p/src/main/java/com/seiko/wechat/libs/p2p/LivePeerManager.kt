@@ -1,7 +1,7 @@
-package com.seiko.wechat.p2p
+package com.seiko.wechat.libs.p2p
 
-import com.seiko.wechat.p2p.model.MetaInfoBuilder
-import com.seiko.wechat.p2p.model.Peer
+import com.seiko.wechat.libs.p2p.model.MetaInfoBuilder
+import com.seiko.wechat.libs.p2p.model.Peer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*

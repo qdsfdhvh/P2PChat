@@ -28,14 +28,6 @@ android {
     buildFeatures {
         viewBinding = true
     }
-    sourceSets {
-        getByName("main") {
-            res.setSrcDirs(listOf(
-                "src/main/res-selector",
-                "src/main/res"
-            ))
-        }
-    }
     resourcePrefix("wechat_") // 仅因个人需要
 }
 
@@ -52,9 +44,6 @@ dependencies {
     }
     kapt(Deps.roomCompiler)
 
-    // 图片选择
-    implementation("com.github.LuckSiege.PictureSelector:picture_library:v2.5.6")
-
     // 圆角图片
     implementation("de.hdodenhof:circleimageview:3.0.0")
 
@@ -62,4 +51,5 @@ dependencies {
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.3")
 
     implementation(project(":libs:p2p"))
+    implementation(project(":libs:picture-selector"))
 }

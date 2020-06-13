@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ResourceName">
+<resources>
     <color name="app_color_white">#FFFFFF</color>
     <color name="app_color_black">#000000</color>
     <color name="app_color_53575e">#53575e</color>

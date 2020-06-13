@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ResourceName">
+<resources>
     <!--新浪微博样式，注意每一项都不能少-->
     <style name="picture.Sina.style" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
