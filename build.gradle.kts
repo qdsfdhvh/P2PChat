@@ -10,6 +10,7 @@ buildscript {
         classpath(Deps.gradle)
         classpath(Deps.navigationSafeArgs)
         classpath(kotlin(module = "gradle-plugin", version = Versions.kotlin))
+        classpath(Deps.daggerPlugin)
     }
 }
 

@@ -5,7 +5,9 @@ object DepsApp {
         Deps.constraintLayout,
         Deps.recyclerview,
         Deps.work,
-        Deps.room
+        Deps.room,
+        Deps.koinAndroidXScope,
+        Deps.koinAndroidXViewModel
     )
 
     val testImplementation = arrayOf(

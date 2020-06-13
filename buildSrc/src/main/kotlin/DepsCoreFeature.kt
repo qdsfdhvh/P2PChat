@@ -1,10 +1,7 @@
 object DepsCoreFeature {
     val api = arrayOf(
         Deps.appCompat,
-
         Deps.kotlinExtensions,
-        Deps.koinAndroidXScope,
-        Deps.koinAndroidXViewModel,
 
         Deps.androidLifecycle,
         Deps.androidLifecycleKtx,

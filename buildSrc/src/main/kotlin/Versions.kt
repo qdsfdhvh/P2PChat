@@ -27,6 +27,8 @@ object Versions {
     const val glide = "4.11.0"
     const val okio = "2.6.0"
     const val compose = "0.1.0-dev13"
+    const val dagger = "2.28-alpha"
+    const val hilt = "1.0.0-alpha01"
 }
 
 object Build {

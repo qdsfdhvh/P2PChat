@@ -32,6 +32,13 @@ object Deps {
     const val navigationUi = "androidx.navigation:navigation-ui-ktx:${Versions.navigation}"
     const val navigationFragment = "androidx.navigation:navigation-fragment-ktx:${Versions.navigation}"
 
+    const val daggerPlugin = "com.google.dagger:hilt-android-gradle-plugin:${Versions.dagger}"
+    const val daggerHiltAndroid = "com.google.dagger:hilt-android:${Versions.dagger}"
+    const val daggerHiltCompiler = "com.google.dagger:hilt-android-compiler:${Versions.dagger}"
+    const val hiltCommon = "androidx.hilt:hilt-common:${Versions.hilt}"
+    const val hiltViewModel = "androidx.hilt:hilt-lifecycle-viewmodel:${Versions.hilt}"
+    const val hiltCompiler = "androidx.hilt:hilt-compiler:${Versions.hilt}"
+
     const val uiFoundation = "androidx.ui:ui-foundation:${Versions.compose}"
     const val uiLayout     = "androidx.ui:ui-layout:${Versions.compose}"
     const val uiMaterial   = "androidx.ui:ui-material:${Versions.compose}"

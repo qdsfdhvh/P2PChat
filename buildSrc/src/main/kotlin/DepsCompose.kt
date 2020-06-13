@@ -5,7 +5,15 @@ object DepsCompose {
         Deps.uiLayout,
         Deps.uiMaterial,
         Deps.uiTooling,
-        Deps.uiLiveData
+        Deps.uiLiveData,
+        Deps.daggerHiltAndroid,
+        Deps.hiltCommon,
+        Deps.hiltViewModel
+    )
+
+    val kapt = arrayOf(
+        Deps.daggerHiltCompiler,
+        Deps.hiltCompiler
     )
 
     val testImplementation = arrayOf(

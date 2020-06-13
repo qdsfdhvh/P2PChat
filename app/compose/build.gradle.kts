@@ -5,6 +5,8 @@ plugins {
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
+    id("androidx.navigation.safeargs.kotlin")
+    id("dagger.hilt.android.plugin")
 }
 
 apply(from = rootProject.file(".buildscript/configure-android-defaults.gradle"))
@@ -23,6 +25,9 @@ tasks.withType<KotlinCompile> {
 dependencies {
     DepsCompose.implementation.forEach { dependency ->
         implementation(dependency)
+    }
+    DepsCompose.kapt.forEach { dependency ->
+        kapt(dependency)
     }
     DepsCompose.testImplementation.forEach { dependency ->
         testImplementation(dependency)
