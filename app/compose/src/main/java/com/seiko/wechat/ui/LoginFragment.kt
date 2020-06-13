@@ -2,14 +2,18 @@ package com.seiko.wechat.ui
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
-import com.seiko.wechat.utils.setThemeContent
+import androidx.fragment.app.viewModels
+import com.seiko.wechat.util.setThemeContent
+import com.seiko.wechat.vm.LoginViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoginFragment : ComposeBaseFragment() {
+
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val viewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
         setThemeContent {
             LoginScreen(viewModel)
         }

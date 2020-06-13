@@ -1,6 +1,5 @@
 object DepsCompose {
     val implementation = arrayOf(
-        Deps.work,
         Deps.uiFoundation,
         Deps.uiLayout,
         Deps.uiMaterial,
@@ -8,7 +7,8 @@ object DepsCompose {
         Deps.uiLiveData,
         Deps.daggerHiltAndroid,
         Deps.hiltCommon,
-        Deps.hiltViewModel
+        Deps.hiltViewModel,
+        Deps.work
     )
 
     val kapt = arrayOf(

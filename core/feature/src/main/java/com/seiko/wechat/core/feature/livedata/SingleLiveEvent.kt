@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package com.seiko.wechat.core.feature
+package com.seiko.wechat.core.feature.livedata
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.LifecycleOwner

@@ -1,4 +1,4 @@
-package com.seiko.wechat.util.timber
+package com.seiko.wechat.core.feature.timber
 
 import timber.log.Timber
 import java.util.*

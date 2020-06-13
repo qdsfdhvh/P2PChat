@@ -1,4 +1,4 @@
-package com.seiko.wechat.utils
+package com.seiko.wechat.util
 
 import android.view.ViewGroup
 import androidx.compose.Composable

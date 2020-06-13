@@ -16,11 +16,11 @@ import com.seiko.wechat.R
 import com.seiko.wechat.compose.ThemedPreview
 import com.seiko.wechat.compose.component.ButtonLightComponent
 import com.seiko.wechat.compose.component.DialogListComponent
-import com.seiko.wechat.compose.component.DialogSingleCheckComponent
 import com.seiko.wechat.compose.component.TextFieldComponent
 import com.seiko.wechat.compose.theme.colorPrimary
 import com.seiko.wechat.compose.theme.spaceSize
 import com.seiko.wechat.compose.widget.CircleImage
+import com.seiko.wechat.vm.LoginViewModel
 
 private object LogoTag
 private object LogoTipTag
@@ -119,12 +119,10 @@ fun LoginScreen(viewModel: LoginViewModel) {
     }
 }
 
-
-
-@Preview("Light")
-@Composable
-fun LoginScreenPreview() {
-    ThemedPreview {
-        LoginScreen(LoginViewModel())
-    }
-}
+//@Preview("Light")
+//@Composable
+//fun LoginScreenPreview() {
+//    ThemedPreview {
+//        LoginScreen(LoginViewModel())
+//    }
+//}

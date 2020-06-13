@@ -1,5 +1,6 @@
 object DepsCoreFeature {
     val api = arrayOf(
+        Deps.multidex,
         Deps.appCompat,
         Deps.kotlinExtensions,
 

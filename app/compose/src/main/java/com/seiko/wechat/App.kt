@@ -1,13 +1,7 @@
 package com.seiko.wechat
 
-import android.app.Application
-import timber.log.Timber
+import com.seiko.wechat.core.feature.app.BaseApplication
+import dagger.hilt.android.HiltAndroidApp
 
-class App : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
-    }
-}
+@HiltAndroidApp
+class App : BaseApplication()

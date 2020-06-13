@@ -14,6 +14,7 @@ apply(from = rootProject.file(".buildscript/configure-android-defaults.gradle"))
 android {
     defaultConfig {
         applicationId = Build.applicationId + ".compose"
+        multiDexEnabled = true
     }
 }
 

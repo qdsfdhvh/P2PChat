@@ -1,13 +1,12 @@
 object DepsApp {
     val implementation = arrayOf(
-        Deps.multidex,
         Deps.preference,
         Deps.constraintLayout,
         Deps.recyclerview,
-        Deps.work,
-        Deps.room,
         Deps.koinAndroidXScope,
-        Deps.koinAndroidXViewModel
+        Deps.koinAndroidXViewModel,
+        Deps.work,
+        Deps.room
     )
 
     val testImplementation = arrayOf(
